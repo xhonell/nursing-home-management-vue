@@ -52,12 +52,12 @@ export const constantRoutes = [
   },
   {
     path: '/login',
-    component: () => import('@/views/login/index'),
+    component: () => import('@/pages/login/index'),
     hidden: true
   },
   {
     path: '/auth-redirect',
-    component: () => import('@/views/login/auth-redirect'),
+    component: () => import('@/pages/login/auth-redirect'),
     hidden: true
   },
   {

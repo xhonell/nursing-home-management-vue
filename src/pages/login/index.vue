@@ -1,12 +1,15 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
-
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      autocomplete="on"
+      label-position="left"
+    >
       <div class="title-container">
-        <h3 class="title">
-          {{ $t('login.title') }}
-        </h3>
-        <lang-select class="set-language" />
+        <h3 class="title">{{ systemTitle }}</h3>
       </div>
 
       <el-form-item prop="username">
@@ -16,7 +19,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          :placeholder="$t('login.username')"
+          placeholder="请输入用户手机号"
           name="username"
           type="text"
           tabindex="1"
@@ -34,7 +37,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            :placeholder="$t('login.password')"
+            placeholder="请输入用户密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -48,69 +51,57 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
-        {{ $t('login.logIn') }}
-      </el-button>
-
-      <div style="position:relative">
-        <div class="tips">
-          <span>{{ $t('login.username') }} : admin</span>
-          <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">
-            {{ $t('login.username') }} : editor
-          </span>
-          <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
-        </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          {{ $t('login.thirdparty') }}
-        </el-button>
-      </div>
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="handleLogin"
+      >{{ $t('login.logIn') }}</el-button>
     </el-form>
-
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
-      {{ $t('login.thirdpartyTips') }}
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
-import LangSelect from '@/components/LangSelect'
-import SocialSign from './components/SocialSignin'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+      // 检查是否为空
+      if (!value) {
+        callback(new Error('用户名不能为空'))
+        return
+      }
+
+      // 判断是否为手机号格式（假设是中国手机号）
+      const phoneRegExp = /^1[3-9]\d{9}$/
+      if (!validUsername(value) && !phoneRegExp.test(value)) {
+        callback(new Error('请输入正确的用户名或手机号'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+      if (value.length < 8) {
+        callback(new Error('密码长度必须大于8位'))
       } else {
         callback()
       }
     }
     return {
+      systemTitle: '养老院管理系统',
       loginForm: {
         username: 'admin',
         password: '111111'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [
+          { required: true, trigger: 'blur', validator: validateUsername }
+        ],
+        password: [
+          { required: true, trigger: 'blur', validator: validatePassword }
+        ]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -148,7 +139,7 @@ export default {
   methods: {
     checkCapslock(e) {
       const { key } = e
-      this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
+      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
     },
     showPwd() {
       if (this.passwordType === 'password') {
@@ -164,9 +155,13 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
+          this.$store
+            .dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+              this.$router.push({
+                path: this.redirect || '/',
+                query: this.otherQuery
+              })
               this.loading = false
             })
             .catch(() => {
@@ -186,84 +181,61 @@ export default {
         return acc
       }, {})
     }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
+$bg: #f1f8f6; // 背景色为浅绿或温馨的蓝绿色
+$light_gray: #333; // 文字颜色
+$primary-color: #61b5b0; // 主题色：柔和蓝绿色
+$dark_gray: #5c6d74; // 输入框图标颜色
+$button-color: #7ec8c2; // 按钮背景色，柔和的绿色
+$button-hover-color: #61b5b0; // 按钮悬停颜色
+$input-border: #d2e1e0; // 输入框边框颜色，温和的浅色
 
-$bg:#283443;
-$light_gray:#fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
-    color: $cursor;
-  }
+body {
+  font-family: "KaiTi", "楷体", "SimKai", "Georgia", serif;
 }
 
 /* reset element-ui css */
 .login-container {
   .el-input {
+    font-family: "KaiTi", "楷体", "SimKai", "Georgia", serif;
     display: inline-block;
     height: 47px;
     width: 85%;
 
     input {
+      font-family: "KaiTi", "楷体", "SimKai", "Georgia", serif;
       background: transparent;
-      border: 0px;
+      border: 1px solid $input-border; // 温和的边框色
       -webkit-appearance: none;
-      border-radius: 0px;
+      border-radius: 4px;
       padding: 12px 5px 12px 15px;
       color: $light_gray;
       height: 47px;
-      caret-color: $cursor;
+      caret-color: $button-color;
 
       &:-webkit-autofill {
         box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
+        -webkit-text-fill-color: $button-color !important;
       }
     }
   }
 
   .el-form-item {
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.05); // 使用淡色背景，营造温馨氛围
+    border-radius: 4px;
     color: #454545;
   }
 }
-</style>
-
-<style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
 
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  background-color: $bg; // 使用温和的浅绿色背景
   overflow: hidden;
 
   .login-form {
@@ -273,26 +245,6 @@ $light_gray:#eee;
     padding: 160px 35px 0;
     margin: 0 auto;
     overflow: hidden;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
   }
 
   .title-container {
@@ -305,15 +257,14 @@ $light_gray:#eee;
       text-align: center;
       font-weight: bold;
     }
+  }
 
-    .set-language {
-      color: #fff;
-      position: absolute;
-      top: 3px;
-      font-size: 18px;
-      right: 0px;
-      cursor: pointer;
-    }
+  .svg-container {
+    padding: 6px 5px 6px 15px;
+    color: $dark_gray;
+    vertical-align: middle;
+    width: 30px;
+    display: inline-block;
   }
 
   .show-pwd {
@@ -326,10 +277,18 @@ $light_gray:#eee;
     user-select: none;
   }
 
-  .thirdparty-button {
-    position: absolute;
-    right: 0;
-    bottom: 6px;
+  .el-button {
+    font-family: "KaiTi", "楷体", "SimKai", "Georgia", serif;
+    background-color: $button-color; // 按钮背景色为柔和绿色
+    border-color: $button-color;
+    color: $light_gray;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px; // 按钮角落圆润
+    &:hover {
+      background-color: $button-hover-color;
+      border-color: $button-hover-color;
+    }
   }
 
   @media only screen and (max-width: 470px) {
