@@ -83,8 +83,8 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 8) {
-        callback(new Error('密码长度必须大于8位'))
+      if (value.length < 6) {
+        callback(new Error('密码长度必须大于6位'))
       } else {
         callback()
       }
@@ -92,8 +92,8 @@ export default {
     return {
       systemTitle: '养老院管理系统',
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '18996459789',
+        password: '123456'
       },
       loginRules: {
         username: [
