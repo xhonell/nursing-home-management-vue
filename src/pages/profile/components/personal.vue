@@ -50,7 +50,7 @@
         </el-col>
       </el-form-item>
       <el-form-item style="margin-top: 50px;">
-        <el-button type="primary" @click="onSubmit">立即创建</el-button>
+        <el-button type="primary" @click="onSubmit">修改</el-button>
         <el-button style="margin-left: 140px;" @click="resetForm">重置</el-button>
       </el-form-item>
     </el-form>
@@ -148,7 +148,6 @@ export default {
     onSubmit() {
       this.$refs.form.validate(async valid => {
         if (valid) {
-          this.$loading(true)
           await this.$store
             .dispatch('user/resetUser', this.form)
             .then(response => {
@@ -161,8 +160,6 @@ export default {
               this.form = data
               this.reset = data
             })
-
-          this.$loading(false)
         } else {
           return false
         }

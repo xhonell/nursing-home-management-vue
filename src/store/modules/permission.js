@@ -1,4 +1,6 @@
-import { asyncRoutes, constantRoutes } from '@/router'
+import { constantRoutes } from '@/router'
+import { router } from '@/api/user'
+import Layout from '@/layout'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -46,18 +48,55 @@ const mutations = {
   }
 }
 
+function concatRouter(router) {
+  const routers = []
+  if (!router || router.length === 0) {
+    return routers
+  } else {
+    router.forEach(item => {
+      const itemRouter = {}
+      itemRouter.path = item.pagePath
+      itemRouter.component = Layout
+      itemRouter.name = item.pageName
+      itemRouter.meta = {}
+      itemRouter.meta.title = item.pageTitle
+      itemRouter.meta.icon = item.pageIcon
+      const children = []
+      item.pageChildren.forEach(child => {
+        const childRouter = {}
+        childRouter.path = child.pagePath
+        childRouter.component = (resolve) => require([`@/pages/${child.pageComponent}`], resolve)
+        childRouter.name = child.pageName
+        childRouter.meta = {}
+        childRouter.meta.title = child.pageTitle
+        childRouter.meta.icon = child.pageIcon
+        children.push(childRouter)
+      })
+      if (children.length > 0) {
+        itemRouter.children = children
+      }
+      routers.push(itemRouter)
+    })
+  }
+  return routers
+}
+
 const actions = {
   generateRoutes({ commit }, roles) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // 这里留接口(/user/getRouter)，用作后期登录权限，需要创建一个组装权限的方法
-      let accessedRoutes
-      if (roles.includes('管理员')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      }
-      commit('SET_ROUTES', accessedRoutes)
-      resolve(accessedRoutes)
+      (async() => {
+        try {
+          let accessedRoutes = []
+          const response = await router(roles)
+          const { data } = response
+          accessedRoutes = concatRouter(data)
+          commit('SET_ROUTES', accessedRoutes)
+          resolve(accessedRoutes)
+        } catch (err) {
+          reject(err)
+        }
+      })()
     })
   }
 }

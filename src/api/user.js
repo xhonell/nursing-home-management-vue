@@ -30,3 +30,19 @@ export function resetUser(data) {
     data
   })
 }
+
+export function resetPassword(data) {
+  return request({
+    url: '/user/resetPassword',
+    method: 'post',
+    data
+  })
+}
+
+export function router(data) {
+  return request({
+    url: '/login/router',
+    method: 'get',
+    params: { 'roles': data }
+  })
+}

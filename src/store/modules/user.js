@@ -6,7 +6,7 @@ const state = {
   token: getToken(),
   name: '',
   avatar: '',
-  introduction: '',
+  id: '',
   roles: []
 }
 
@@ -14,8 +14,8 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_INTRODUCTION: (state, introduction) => {
-    state.introduction = introduction
+  SET_ID: (state, id) => {
+    state.id = id
   },
   SET_NAME: (state, name) => {
     state.name = name
@@ -54,7 +54,7 @@ const actions = {
           reject('登录过期，请重新登录！')
         }
 
-        const { rolePrivileges, roleName, roleImage } = data
+        const { rolePrivileges, roleName, roleImage, roleId } = data
 
         // roles must be a non-empty array
         if (!rolePrivileges || rolePrivileges.length <= 0) {
@@ -62,6 +62,7 @@ const actions = {
         }
 
         commit('SET_ROLES', rolePrivileges)
+        commit('SET_ID', roleId)
         commit('SET_NAME', roleName)
         commit('SET_AVATAR', roleImage)
         resolve(data)
