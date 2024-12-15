@@ -49,6 +49,7 @@ const mutations = {
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
+      // 这里留接口(/user/getRouter)，用作后期登录权限，需要创建一个组装权限的方法
       let accessedRoutes
       if (roles.includes('管理员')) {
         accessedRoutes = asyncRoutes || []
