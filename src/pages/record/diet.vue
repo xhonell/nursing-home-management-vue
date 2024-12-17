@@ -306,8 +306,8 @@ export default {
           message: response.msg,
           type: "success"
         });
+        this.getList();
       });
-      this.getList();
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {
