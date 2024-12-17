@@ -89,6 +89,11 @@ export const constantRoutes = [
         meta: { title: 'profile', icon: 'user', noCache: true }
       }
     ]
+  },
+  {
+    path: '/forget',
+    component: () => import('@/pages/forget/index'),
+    hidden: true
   }
 ]
 

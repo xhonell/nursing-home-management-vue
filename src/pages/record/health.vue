@@ -135,7 +135,7 @@
         <el-form-item label="记录编号" hidden>
           <el-input v-model="temp.healthId" />
         </el-form-item>
-        <el-form-item label="健康状态">
+        <el-form-item label="健康状态" prop="healthState">
           <el-select v-model="temp.healthState" placeholder="请选择">
             <el-option v-for="item in state" :key="item" :label="item" :value="item"></el-option>
           </el-select>
@@ -146,7 +146,7 @@
         <el-form-item label="体重" prop="healthWeight">
           <el-input v-model="temp.healthWeight" />
         </el-form-item>
-        <el-form-item label="血压" prop="healthBoold">
+        <el-form-item label="血压" prop="healthBlood">
           <el-input v-model="temp.healthBlood" />
         </el-form-item>
         <el-form-item label="心率" prop="healthHeart">
@@ -160,7 +160,7 @@
             <el-option v-for="(item,index) in olderIds" :key="index" :label="item" :value="item"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="老人名称">
+        <el-form-item label="老人名称" prop="olderName">
           <el-select v-model="temp.olderName"  placeholder="请选择"  @change="onOlderNameChange">
             <el-option v-for="(item,index) in olderNames" :key="index" :label="item" :value="item"></el-option>
           </el-select>
@@ -249,7 +249,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        dietTime: [
+        healthTime: [
           {
             type: "date",
             required: true,
@@ -257,8 +257,23 @@ export default {
             trigger: "change"
           }
         ],
-        dietFood: [
-          { required: true, message: "膳食内容不能为空", trigger: "blur" }
+        healthState: [
+          { required: true, message: "健康状态不能为空", trigger: "blur" }
+        ],
+        healthBlood:[
+          { required: true, message: "血压不能为空", trigger: "blur" }
+        ],
+        healthHeart:[
+          { required: true, message: "心率不能为空", trigger: "blur" }
+        ],
+        healthWeight:[
+          { required: true, message: "体重不能为空", trigger: "blur" }
+        ],
+        healthHeight:[
+          { required: true, message: "身高不能为空", trigger: "blur" }
+        ],
+        olderName: [
+          { required: true, message: "老人姓名不能为空", trigger: "blur" }
         ]
       },
       downloadLoading: false
