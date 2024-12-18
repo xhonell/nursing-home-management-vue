@@ -13,23 +13,23 @@ const personRouter = {
   },
   children: [
     {
-        path: 'doctor',
-        component: () => import('@/page/person/doctor/index'),
-        name: 'Doctor',
-        meta: { title: '医护人员管理' }
-      },
-      {
-        path: 'older',
-        component: () => import('@/page/person/older/index'),
-        name: 'Older',
-        meta: { title: '老人信息管理' }
-      },
-      {
-        path: 'relation',
-        component: () => import('@/page/person/relation/index'),
-        name: 'Relation',
-        meta: { title: '家属信息管理' }
-      }
+      path: 'doctor',
+      component: () => import('@/page/person/doctor/index'),
+      name: 'Doctor',
+      meta: { title: '医护人员管理' }
+    },
+    {
+      path: 'older',
+      component: () => import('@/page/person/older/index'),
+      name: 'Older',
+      meta: { title: '老人信息管理' }
+    },
+    {
+      path: 'relation',
+      component: () => import('@/page/person/relation/index'),
+      name: 'Relation',
+      meta: { title: '家属信息管理' }
+    }
   ]
 }
 

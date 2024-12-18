@@ -24,8 +24,8 @@
       </el-button>
     </div>
 
-   <!--表格内容-->
-   <el-table
+    <!--表格内容-->
+    <el-table
       :key="tableKey"
       v-loading="listLoading"
       :data="list"
@@ -33,63 +33,64 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange">
+      @sort-change="sortChange"
+    >
       <el-table-column label="编号" prop="olderId" sortable="custom" align="center" width="160" :class-name="getSortClass('olderId')">
         <template slot-scope="{row}">
           <span>{{ row.olderId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="姓名" prop="olderName" sortable="custom" align="center" width="160" >
+      <el-table-column label="姓名" prop="olderName" sortable="custom" align="center" width="160">
         <template slot-scope="{row}">
           <span>{{ row.olderName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性别" prop="olderSex" sortable="custom" align="center" width="500" >
+      <el-table-column label="性别" prop="olderSex" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderSex }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="年龄" prop="olderAge" sortable="custom" align="center" width="500" >
+      <el-table-column label="年龄" prop="olderAge" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderAge }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="出生日期" prop="olderBirth" sortable="custom" align="center" width="500" >
+      <el-table-column label="出生日期" prop="olderBirth" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderBirth }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="电话号码" prop="olderPhone" sortable="custom" align="center" width="500" >
+      <el-table-column label="电话号码" prop="olderPhone" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderPhone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="健康状态" prop="olderHealth" sortable="custom" align="center" width="500" >
+      <el-table-column label="健康状态" prop="olderHealth" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderHealth }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="既往病史" prop="olderHistory" sortable="custom" align="center" width="500" >
+      <el-table-column label="既往病史" prop="olderHistory" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderHistory }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="入院时间" prop="olderStartTime" sortable="custom" align="center" width="500" >
+      <el-table-column label="入院时间" prop="olderStartTime" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderStartTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="出院时间" prop="olderEndTime" sortable="custom" align="center" width="500" >
+      <el-table-column label="出院时间" prop="olderEndTime" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderEndTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="医护等级" prop="gradeName" sortable="custom" align="center" width="500" >
+      <el-table-column label="医护等级" prop="gradeName" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.gradeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" prop="olderRemark" sortable="custom" align="center" width="500" >
+      <el-table-column label="备注" prop="olderRemark" sortable="custom" align="center" width="500">
         <template slot-scope="{row}">
           <span>{{ row.olderRemark }}</span>
         </template>
@@ -109,11 +110,11 @@
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-     <!--修改的表单-->
-     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <!--修改的表单-->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="编号">
-          <el-input v-model="temp.olderId" :autosize="{ minRows: 2, maxRows: 4}" retype="text" readonly/>
+          <el-input v-model="temp.olderId" :autosize="{ minRows: 2, maxRows: 4}" retype="text" readonly />
         </el-form-item>
         <el-form-item label="姓名">
           <el-input v-model="temp.olderName" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入姓名" />
@@ -177,7 +178,7 @@
 </template>
 
 <script>
-import {findByPage, deleteOlder, addOlder, updateOlder, findAllOlderHealthList } from '@/api/person/older'
+import { findByPage, deleteOlder, addOlder, updateOlder, findAllOlderHealthList } from '@/api/person/older'
 import { findAllGradeList } from '@/api/person/grade'
 import moment from 'moment'
 import waves from '@/directive/waves' // waves directive
@@ -191,38 +192,38 @@ export default {
   data() {
     return {
       tableKey: 0,
-      list: null, //列表数据
-      total: 0,  //总数据
+      list: null, // 列表数据
+      total: 0, // 总数据
       listLoading: true,
-      listQuery: { //查询数据
+      listQuery: { // 查询数据
         page: 1,
         limit: 10,
         olderName: undefined,
         olderSex: undefined,
-        olderAge:undefined,
-        olderBirth:undefined,
-        olderHealth:undefined,
-        olderStartTime:undefined,
-        olderEndTime:undefined,
-        gradeId:undefined,
+        olderAge: undefined,
+        olderBirth: undefined,
+        olderHealth: undefined,
+        olderStartTime: undefined,
+        olderEndTime: undefined,
+        gradeId: undefined
       },
-      olderHealthList:null,
-      gradeList:null,
+      olderHealthList: null,
+      gradeList: null,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       showReviewer: false,
-      temp: { //修改数据
+      temp: { // 修改数据
         olderId: undefined,
-        olderName: "",
-        olderSex:"",
-        olderAge:"",
-        olderBirth:new Date(),
-        olderPhone:"",
-        olderHealth:"",
-        olderHistory:"",
-        olderStartTime:new DateTime(),
-        olderEndTime:new DateTime(),
-        gradeId:"",
-        olderRemark:""
+        olderName: '',
+        olderSex: '',
+        olderAge: '',
+        olderBirth: new Date(),
+        olderPhone: '',
+        olderHealth: '',
+        olderHistory: '',
+        olderStartTime: new DateTime(),
+        olderEndTime: new DateTime(),
+        gradeId: '',
+        olderRemark: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -238,44 +239,44 @@ export default {
       downloadLoading: false
     }
   },
-  created() { //数据加载之后，页面渲染之前
+  created() { // 数据加载之后，页面渲染之前
     this.getList()
     this.getOlderHealthList()
     this.getGradeList()
   },
   methods: {
-    //获取列表数据
-    getList() { //获取列表数据list、总数据total
-      this.listLoading = true;
-      findByPage(this.listQuery).then(response =>{
-        this.list=response.data.olderList
-        this.total=response.data.total
-        setTimeout(()=>{
+    // 获取列表数据
+    getList() { // 获取列表数据list、总数据total
+      this.listLoading = true
+      findByPage(this.listQuery).then(response => {
+        this.list = response.data.olderList
+        this.total = response.data.total
+        setTimeout(() => {
           this.listLoading = false
         })
       })
     },
-    //获取健康状态列表
-    getOlderHealthList(){
-      this.listLoading=true;
-      findAllOlderHealthList(this.listQuery).then(response =>{
-        this.olderHealthList=response.data.olderHealthList
-        setTimeout(()=>{
+    // 获取健康状态列表
+    getOlderHealthList() {
+      this.listLoading = true
+      findAllOlderHealthList(this.listQuery).then(response => {
+        this.olderHealthList = response.data.olderHealthList
+        setTimeout(() => {
           this.listLoading = false
         })
       })
     },
-    //获取医护等级列表
-    getGradeList(){
-      this.listLoading=true;
-      findAllGradeList(this.listQuery).then(response =>{
-        this.gradeList=response.data.gradeList
-        setTimeout(()=>{
+    // 获取医护等级列表
+    getGradeList() {
+      this.listLoading = true
+      findAllGradeList(this.listQuery).then(response => {
+        this.gradeList = response.data.gradeList
+        setTimeout(() => {
           this.listLoading = false
         })
       })
     },
-    //查询，分页
+    // 查询，分页
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
@@ -305,21 +306,21 @@ export default {
     resetTemp() {
       this.temp = {
         olderId: undefined,
-        olderName: "",
-        olderSex:"",
-        olderAge:"",
-        olderBirth:new Date(),
-        olderPhone:"",
-        olderHealth:"",
-        olderHistory:"",
-        olderStartTime:new DateTime(),
-        olderEndTime:new DateTime(),
-        gradeId:"",
-        olderRemark:""
+        olderName: '',
+        olderSex: '',
+        olderAge: '',
+        olderBirth: new Date(),
+        olderPhone: '',
+        olderHealth: '',
+        olderHistory: '',
+        olderStartTime: new DateTime(),
+        olderEndTime: new DateTime(),
+        gradeId: '',
+        olderRemark: ''
       }
     },
 
-    //添加，弹出修改表单
+    // 添加，弹出修改表单
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -330,16 +331,16 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
-        //判断验证是否通过
+        // 判断验证是否通过
         if (valid) {
           this.temp.olderBirth = moment(String(this.temp.olderBirth)).format('yyyy-MM-DD')
           this.temp.olderStartTime = moment(String(this.temp.olderStartTime)).format('yyyy-MM-DD HH:mm:ss')
           this.temp.olderEndTime = moment(String(this.temp.olderEndTime)).format('yyyy-MM-DD HH:mm:ss')
           addOlder(this.temp).then(() => {
             // this.list.unshift(this.temp)
-            //把添加的数据存储到集合中
-            this.getList();
-            //关闭弹窗
+            // 把添加的数据存储到集合中
+            this.getList()
+            // 关闭弹窗
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -352,7 +353,7 @@ export default {
       })
     },
 
-    //修改，弹出修改表单
+    // 修改，弹出修改表单
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
@@ -365,16 +366,16 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          //把temp中的数据拷贝到tempData中，作为临时数据
+          // 把temp中的数据拷贝到tempData中，作为临时数据
           const tempData = Object.assign({}, this.temp)
           this.temp.olderBirth = moment(String(this.temp.olderBirth)).format('yyyy-MM-DD')
           this.temp.olderStartTime = moment(String(this.temp.olderStartTime)).format('yyyy-MM-DD HH:mm:ss')
           this.temp.olderEndTime = moment(String(this.temp.olderEndTime)).format('yyyy-MM-DD HH:mm:ss')
           updateOlder(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
-            //替换
+            // 替换
             // this.list.splice(index, 1, this.temp)
-            this.getList();
+            this.getList()
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -387,15 +388,15 @@ export default {
       })
     },
 
-    //删除
+    // 删除
     handleDelete(row, index) {
-      deleteOlder(row.olderId).then(()=>{
-        this.getList();
+      deleteOlder(row.olderId).then(() => {
+        this.getList()
         this.$notify({
-          title:'成功',
-          message:'删除成功',
-          type:'success',
-          duration:2000
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
         })
       })
     },
