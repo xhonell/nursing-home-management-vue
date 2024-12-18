@@ -28,7 +28,7 @@
       </el-form-item>
 
       <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
-        <el-form-item prop="password">
+        <el-form-item prop="password" style="margin-bottom:5px">
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
@@ -50,11 +50,14 @@
           </span>
         </el-form-item>
       </el-tooltip>
+       <router-link to="/forget">
+        <span>忘记密码</span>
+      </router-link>
 
       <el-button
         :loading="loading"
         type="primary"
-        style="width:100%;margin-bottom:30px;"
+        style="width:100%;margin-bottom:30px; margin-top:5px"
         @click.native.prevent="handleLogin"
       >{{ $t('login.logIn') }}</el-button>
     </el-form>
@@ -197,6 +200,8 @@ $input-border: #d2e1e0; // 输入框边框颜色，温和的浅色
 body {
   font-family: "KaiTi", "楷体", "SimKai", "Georgia", serif;
 }
+
+
 
 /* reset element-ui css */
 .login-container {
