@@ -57,6 +57,7 @@ function concatRouter(router) {
       const itemRouter = {}
       itemRouter.path = item.pagePath
       itemRouter.component = Layout
+      itemRouter.hidden = item.pageHidden
       itemRouter.name = item.pageName
       itemRouter.meta = {}
       itemRouter.meta.title = item.pageTitle
@@ -66,6 +67,7 @@ function concatRouter(router) {
         const childRouter = {}
         childRouter.path = child.pagePath
         childRouter.component = (resolve) => require([`@/pages${child.pageComponent}`], resolve)
+        childRouter.hidden = child.pageHidden
         childRouter.name = child.pageName
         childRouter.meta = {}
         childRouter.meta.title = child.pageTitle

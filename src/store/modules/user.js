@@ -1,12 +1,14 @@
 import { login, logout, getInfo, resetUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import { getDoctorInformation } from '@/api/leave'
 
 const state = {
   token: getToken(),
   name: '',
   avatar: '',
   id: '',
+  doctorId: '',
   roles: []
 }
 
@@ -25,6 +27,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_DOCTORID: (state, doctorId) => {
+    state.doctorId = doctorId
   }
 }
 
@@ -45,7 +50,7 @@ const actions = {
   },
 
   // get user info
-  getInfo({ commit, state }) {
+  getInfo({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
@@ -62,6 +67,9 @@ const actions = {
         }
 
         commit('SET_ROLES', rolePrivileges)
+        if (rolePrivileges.includes('医护人员')) {
+          dispatch('getDoctorInfo', roleId)
+        }
         commit('SET_ID', roleId)
         commit('SET_NAME', roleName)
         commit('SET_AVATAR', roleImage)
@@ -115,6 +123,20 @@ const actions = {
     })
   },
 
+  getDoctorInfo({ commit }, roleId) {
+    return new Promise(async (resolve, reject) => {
+      await getDoctorInformation(roleId).then(response => {
+        const { data } = response
+        if (this.state.user.doctorId === "" || this.state.user.doctorId !== data.doctorId) {
+          commit('SET_DOCTORID', data.doctorId)
+        }
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
   // dynamically modify permissions
   async changeRoles({ commit, dispatch }, role) {
     const token = role + '-token'
@@ -134,6 +156,8 @@ const actions = {
     // reset visited views and cached views
     dispatch('tagsView/delAllViews', null, { root: true })
   }
+
+
 }
 
 export default {
