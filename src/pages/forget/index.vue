@@ -60,22 +60,6 @@
 import { sendCode, resetPass } from "@/api/forget";
 export default {
   data() {
-    var checkAge = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("年龄不能为空"));
-      }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error("请输入数字值"));
-        } else {
-          if (value < 18) {
-            callback(new Error("必须年满18岁"));
-          } else {
-            callback();
-          }
-        }
-      }, 1000);
-    };
     var validatePass = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入密码"));
@@ -175,7 +159,8 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
+
 .app {
   display: flex;
   flex-direction: column; /* 确保子元素垂直排列 */
@@ -209,4 +194,7 @@ export default {
   margin: 0 auto; /* 移除或调整 margin */
 }
 
+input {
+  font-family: "楷体";
+}
 </style>
