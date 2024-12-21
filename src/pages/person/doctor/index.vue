@@ -1,18 +1,24 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.doctorName" placeholder="姓名" style="width: 120px ;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.doctorSex" placeholder="性别" style="width: 120px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.doctorAge" placeholder="年龄" style="width: 120px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.departmentId" placeholder="部门" clearable class="filter-item" style="width: 120px;margin-left: 10px;">
+      <el-input v-model="listQuery.doctorName" placeholder="姓名" style="width: 120px ;" clearable class="filter-item" @change="handleFilter" />
+      <el-select v-model="listQuery.doctorSex" placeholder="性别" style="width: 120px;margin-left: 10px;" clearable class="filter-item" @change="handleFilter" >
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"/>
+      </el-select>
+      <el-input v-model="listQuery.doctorAge" placeholder="年龄" style="width: 120px ;margin-left: 10px;" clearable class="filter-item" @change="handleFilter" />
+      <el-select v-model="listQuery.departmentId" placeholder="部门" clearable class="filter-item" style="width: 130px;margin-left: 10px;" @change="handleFilter">
         <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName+'('+item.departmentId+')'" :value="item.departmentId" />
       </el-select>
-      <el-select v-model="listQuery.positionId" placeholder="职位" clearable class="filter-item" style="width: 120px;margin-left: 10px;">
+      <el-select v-model="listQuery.positionId" placeholder="职位" clearable class="filter-item" style="width: 120px;margin-left: 10px;" @change="handleFilter">
         <el-option v-for="item in positionList" :key="item.positionId" :label="item.positionName+'('+item.positionId+')'" :value="item.positionId" />
       </el-select>
-      <el-input v-model="listQuery.doctorPopularity" placeholder="评分" style="width: 120px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.doctorStartTime" placeholder="工作开始时间" style="width: 120px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.doctorEndTime" placeholder="工作结束时间" style="width: 120px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.doctorPopularity" placeholder="评分" style="width: 120px ;margin-left: 10px;" clearable class="filter-item" @change="handleFilter" />
+      <el-time-picker v-model="listQuery.doctorStartTime" format="HH:mm:ss" value-format="HH:mm:ss"
+        :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }" placeholder="工作开始时间" style="width: 160px; margin-left: 10px;" class="filter-item"
+        @change="handleFilter" />
+        <el-time-picker v-model="listQuery.doctorEndTime" format="HH:mm:ss" value-format="HH:mm:ss"
+        :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }" placeholder="工作结束时间" style="width: 160px; margin-left: 10px;" class="filter-item"
+        @change="handleFilter" />
       <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         {{ $t('table.search') }}
       </el-button>
@@ -33,11 +39,10 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
-    >
-      <el-table-column label="编号" prop="doctorId" sortable="custom" align="center" width="80" :class-name="getSortClass('doctorId')">
-        <template slot-scope="{row}">
-          <span>{{ row.doctorId }}</span>
+      @sort-change="sortChange">
+      <el-table-column label="编号" align="center" width="100" >
+        <template slot-scope="scope">
+          <span>{{((listQuery.page - 1) * listQuery.limit) + (scope.$index + 1)}}</span>
         </template>
       </el-table-column>
       <el-table-column label="姓名" prop="doctorName" sortable="custom" align="center" width="80">
@@ -75,38 +80,24 @@
           <span>{{ row.positionName }}</span>
         </template>
       </el-table-column>
+      <!--鼠标悬停显示详细内容-->
       <el-table-column label="工作内容" prop="doctorJob" sortable="custom" align="center" width="120">
         <template slot-scope="{row}">
-          <el-popover
-            placement="top"
-            width="300"
-            trigger="hover"
-            :content="row.doctorJob"
-          >
+          <el-popover placement="top" width="300" trigger="hover" :content="row.doctorJob">
             <span slot="reference" class="popover-content">{{ row.doctorJob | truncate }}</span>
           </el-popover>
         </template>
       </el-table-column>
       <el-table-column label="个人简介" prop="doctorIntroduction" sortable="custom" align="center" width="120">
         <template slot-scope="{row}">
-          <el-popover
-            placement="top"
-            width="300"
-            trigger="hover"
-            :content="row.doctorIntroduction"
-          >
+          <el-popover placement="top" width="300" trigger="hover" :content="row.doctorIntroduction">
             <span slot="reference" class="popover-content">{{ row.doctorIntroduction | truncate }}</span>
           </el-popover>
         </template>
       </el-table-column>
       <el-table-column label="工作经验" prop="doctorExperience" sortable="custom" align="center" width="120">
         <template slot-scope="{row}">
-          <el-popover
-            placement="top"
-            width="300"
-            trigger="hover"
-            :content="row.doctorExperience"
-          >
+          <el-popover placement="top" width="300" trigger="hover" :content="row.doctorExperience">
             <span slot="reference" class="popover-content">{{ row.doctorExperience | truncate }}</span>
           </el-popover>
         </template>
@@ -144,44 +135,51 @@
     <!--修改的表单-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="编号">
+        <el-form-item label="编号" hidden>
           <el-input v-model="temp.doctorId" :autosize="{ minRows: 2, maxRows: 4}" retype="text" readonly />
         </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="temp.doctorName" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入姓名" />
+        <el-form-item label="姓名" prop="doctorName">
+          <el-input v-model="temp.doctorName" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入姓名" />
         </el-form-item>
-        <el-form-item label="性别">
-          <el-input v-model="temp.doctorSex" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入性别" />
+        <el-form-item label="性别" prop="doctorSex">
+          <el-select v-model="temp.doctorSex" :autosize="{ minRows: 2, maxRows: 4 }" style="width: 330px;" clearable placeholder="请选择性别">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="年龄">
-          <el-input v-model="temp.doctorAge" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入年龄" />
+          <el-input v-model="temp.doctorAge" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入年龄" />
         </el-form-item>
-        <el-form-item label="电话号码">
-          <el-input v-model="temp.doctorPhone" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入电话号码" />
+        <el-form-item label="电话号码" prop="doctorPhone" class="no-wrap-label">
+          <el-input v-model="temp.doctorPhone" :autosize="{ minRows: 2, maxRows: 4}" type="text" style="width: 310px; margin-left: 20px;" clearable placeholder="请输入电话号码" />
         </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="temp.doctorEmail" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入邮箱" />
+        <el-form-item label="邮箱" prop="doctorEmail">
+          <el-input v-model="temp.doctorEmail" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="工作内容">
-          <el-input v-model="temp.doctorJob" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" placeholder="请输入工作内容" />
+          <el-input v-model="temp.doctorJob" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" clearable placeholder="请输入工作内容" />
         </el-form-item>
         <el-form-item label="个人简介">
-          <el-input v-model="temp.doctorIntroduction" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" placeholder="请输入个人简介" />
+          <el-input v-model="temp.doctorIntroduction" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" clearable placeholder="请输入个人简介" />
         </el-form-item>
         <el-form-item label="工作经验">
-          <el-input v-model="temp.doctorExperience" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" placeholder="请输入工作经验" />
+          <el-input v-model="temp.doctorExperience" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" clearable placeholder="请输入工作经验" />
         </el-form-item>
-        <el-form-item label="工作开始时间">
-          <el-input v-model="temp.doctorStartTime" :autosize="{ minRows: 2, maxRows: 4}" type="datetime" placeholder="请输入工作开始时间" />
+        <el-form-item label="工作开始时间" class="no-wrap-label">
+          <el-time-picker v-model="temp.doctorStartTime" autosize="{ minRows: 2, maxRows: 4}" type="datetime"
+            format="HH:mm:ss" value-format="HH:mm:ss" placeholder="请选择入院时间"
+            style="width: 300px; margin-left: 30px;" class="filter-item" />
         </el-form-item>
-        <el-form-item label="工作结束时间">
-          <el-input v-model="temp.doctorEndTime" :autosize="{ minRows: 2, maxRows: 4}" type="datetime" placeholder="请输入工作结束时间" />
+        <el-form-item label="工作结束时间" class="no-wrap-label">
+          <el-time-picker v-model="temp.doctorEndTime" autosize="{ minRows: 2, maxRows: 4}" type="datetime"
+            format="HH:mm:ss" value-format="HH:mm:ss" placeholder="请选择入院时间"
+            style="width: 300px; margin-left: 30px;" class="filter-item"/>
         </el-form-item>
         <el-form-item label="评分">
-          <el-input v-model="temp.doctorPopularity" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入评分" />
+          <el-input v-model="temp.doctorPopularity" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入评分" />
         </el-form-item>
         <el-form-item label="职位">
-          <el-select v-model="temp.positionId" placeholder="职位" clearable class="filter-item" style="width: 130px">
+          <el-select v-model="temp.positionId" placeholder="职位" clearable class="filter-item" style="width: 330px">
             <el-option v-for="item in positionAllList" :key="item.positionId" :label="item.positionName+'('+item.positionId+')'" :value="item.positionId" />
           </el-select>
         </el-form-item>
@@ -230,6 +228,13 @@ export default {
   },
   data() {
     return {
+      options: [{ //性别选项
+          value: '男',
+          label: '男'
+        },{
+          value: '女',
+          label: '女'
+        }],
       tableKey: 0,
       list: null, // 列表数据
       total: 0, // 总数据
@@ -269,13 +274,16 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: '修改',
-        create: '添加'
+        update: '修改医护人员信息',
+        create: '添加医护人员信息'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        doctorName: [{ required: true, message: '不能为空', trigger: 'change' }]
+        doctorName: [{ required: true, message: '不能为空', trigger: 'change' }],
+        doctorSex: [{ required: true, message: '不能为空', trigger: 'change' }],
+        doctorPhone: [{ required: true, message: '不能为空', trigger: 'change' }],
+        doctorEmail: [{ required: true, message: '不能为空', trigger: 'change' }]
       },
       downloadLoading: false
     }
@@ -387,8 +395,8 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         // 判断验证是否通过
         if (valid) {
-          this.temp.doctorStartTime = moment(String(this.temp.doctorStartTime)).format('HH:mm:ss')
-          this.temp.doctorEndTime = moment(String(this.temp.doctorEndTime)).format('HH:mm:ss')
+          // this.temp.doctorStartTime = moment(String(this.temp.doctorStartTime)).format('HH:mm:ss')
+          // this.temp.doctorEndTime = moment(String(this.temp.doctorEndTime)).format('HH:mm:ss')
           addDoctor(this.temp).then(() => {
             // this.list.unshift(this.temp)
             // 把添加的数据存储到集合中
@@ -421,8 +429,8 @@ export default {
         if (valid) {
           // 把temp中的数据拷贝到tempData中，作为临时数据
           const tempData = Object.assign({}, this.temp)
-          this.temp.doctorStartTime = moment(String(this.temp.doctorStartTime)).format('HH:mm:ss')
-          this.temp.doctorEndTime = moment(String(this.temp.doctorEndTime)).format('HH:mm:ss')
+          // this.temp.doctorStartTime = moment(String(this.temp.doctorStartTime)).format('HH:mm:ss')
+          // this.temp.doctorEndTime = moment(String(this.temp.doctorEndTime)).format('HH:mm:ss')
           updateDoctor(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             // 替换
@@ -492,5 +500,11 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+</style>
+
+<style>
+.no-wrap-label .el-form-item__label {
+  white-space: nowrap;
 }
 </style>

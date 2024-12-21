@@ -7,6 +7,7 @@ export function findByPage(query) {
     params: query // 表单数据
   })
 }
+
 export function deleteRelation(relationId) {
   return request({
     url: '/relation/deleteRelation',
@@ -27,5 +28,12 @@ export function updateRelation(data) {
     url: '/relation/updateRelation',
     method: 'post',
     data // JSON数据
+  })
+}
+
+export function findAllRelationshipList() {
+  return request({
+    url: '/relation/findAllRelationship',
+    method: 'get',
   })
 }

@@ -18,7 +18,7 @@ export function addOlder(data) {
   return request({
     url: '/older/addOlder',
     method: 'post',
-    data // JSON数据
+    data
   })
 }
 
