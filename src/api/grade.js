@@ -40,9 +40,9 @@ export function updateArticle(data) {
   })
 }
 export function deleteArticle(id) {
-    return request({
-      url: '/grade/delete',
-      method: 'post',
-      params: { "gradeId" : id }
-    })
-  }
+  return request({
+    url: '/grade/delete',
+    method: 'post',
+    params: { 'gradeId': id }
+  })
+}

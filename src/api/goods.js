@@ -40,9 +40,9 @@ export function updateArticle(data) {
   })
 }
 export function deleteArticle(id) {
-    return request({
-      url: '/goods/delete',
-      method: 'post',
-      params: { "goodsId" : id }
-    })
-  }
+  return request({
+    url: '/goods/delete',
+    method: 'post',
+    params: { 'goodsId': id }
+  })
+}
