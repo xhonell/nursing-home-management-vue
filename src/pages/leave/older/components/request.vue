@@ -8,19 +8,24 @@
       label-position="left"
       class="demo-ruleForm"
     >
-      <el-form-item label="请假人员名称">
+      <el-form-item label="请假老人名称">
         <el-col :span="8">
-          <el-input v-model="ruleForm.doctorName" readonly></el-input>
+          <el-input v-model="ruleForm.olderName" readonly></el-input>
         </el-col>
       </el-form-item>
-      <el-form-item label="部门名称">
+      <el-form-item label="代请家属名称">
         <el-col :span="8">
-          <el-input v-model="ruleForm.departmentName" readonly></el-input>
+          <el-input v-model="ruleForm.relationName" readonly></el-input>
         </el-col>
       </el-form-item>
-      <el-form-item label="职位名称">
+      <el-form-item label="与老人关系">
         <el-col :span="8">
-          <el-input v-model="ruleForm.positionName" readonly></el-input>
+          <el-input v-model="ruleForm.relationship" readonly></el-input>
+        </el-col>
+      </el-form-item>
+      <el-form-item label="家庭地址">
+        <el-col :span="12">
+          <el-input v-model="ruleForm.relationAddress" readonly></el-input>
         </el-col>
       </el-form-item>
       <el-form-item label="请假时间" prop="leaveStartTime">
@@ -35,7 +40,12 @@
           <span>-</span>
         </el-col>
         <el-col :span="8">
-          <el-date-picker v-model="ruleForm.leaveEndTime" type="datetime" placeholder="请选择结束请假时间" prop="leaveEndTime"/>
+          <el-date-picker
+            v-model="ruleForm.leaveEndTime"
+            type="datetime"
+            placeholder="请选择结束请假时间"
+            prop="leaveEndTime"
+          />
         </el-col>
       </el-form-item>
       <el-form-item label="请假原因" prop="leaveReason">
@@ -50,24 +60,24 @@
     </el-form>
   </div>
 </template>
-
-<script>
+  
+  <script>
 import { mapGetters } from "vuex";
-import { sendDoctorRequest } from "@/api/leave";
+import { sendOlderRequest } from "@/api/leave";
 
 export default {
   data() {
     return {
       ruleForm: {
-        departmentId: undefined,
-        departmentName: "",
-        doctorId: undefined,
-        doctorName: "",
-        positionId: undefined,
-        positionName: "",
-        leaveReason: "",
-        leaveStartTime: undefined,
-        leaveEndTime: ""
+        olderId: undefined,
+        olderName: "",
+        relationId: undefined,
+        relationName: "",
+        relationship: "",
+        relationAddress: "",
+        leaveStartTime:"",
+        leaveEndTime: "",
+        leaveReason: ""
       },
       rules: {
         leaveStartTime: [
@@ -100,22 +110,21 @@ export default {
         callback(new Error("请选择请假时间"));
       } else if (new Date(this.ruleForm.leaveEndTime) <= new Date(value)) {
         callback(new Error("开始时间不能大于或等于结束时间"));
-      } else if (new Date(value) <= new Date() ){
+      } else if (new Date(value) <= new Date()) {
         callback(new Error("开始时间不能小于当前时间"));
       } else {
         callback();
       }
     },
     getPersonal() {
-      this.$store.dispatch('user/getDoctorInfo',this.id)
-      .then(data => {
-        this.ruleForm = { ...this.ruleForm, ...data }; 
+      this.$store.dispatch("user/getOlderInfo", this.id).then(data => {
+        this.ruleForm = { ...this.ruleForm, ...data };
       });
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          sendDoctorRequest(this.ruleForm).then(response => {
+          sendOlderRequest(this.ruleForm).then(response => {
             this.$message({
               message: response.msg,
               type: "success"
@@ -131,8 +140,8 @@ export default {
   }
 };
 </script>
-
-<style>
+  
+  <style>
 input {
   font-family: "楷体";
 }

@@ -8,7 +8,7 @@ export function getDoctorInformation(id) {
   })
 }
 
-export function sendRequest(data) {
+export function sendDoctorRequest(data) {
   return request({
     url: '/doctorLeave/request',
     method: 'post',
@@ -16,11 +16,26 @@ export function sendRequest(data) {
   })
 }
 
+export function sendOlderRequest(data) {
+  return request({
+    url: '/olderLeave/request',
+    method: 'post',
+    data
+  })
+}
 export function getRequestInformation(id){
   return request({
     url: '/doctorLeave/requestInformation',
     method: 'get',
     params: { "doctorId":id }
+  })
+}
+
+export function getOlderRequestInformation(id){
+  return request({
+    url: '/olderLeave/requestInformation',
+    method: 'get',
+    params: { "relationId":id }
   })
 }
 
@@ -36,5 +51,21 @@ export function updateDoctorLeave(leaveId,leaveState){
     url: '/adminHandle/updateDoctorLeave',
     method: 'get',
     params: { "leaveId":leaveId,"leaveState":leaveState }
+  })
+}
+
+export function updateOlderLeave(leaveId,leaveState){
+  return request({
+    url: '/adminHandle/updateOlderLeave',
+    method: 'get',
+    params: { "leaveId":leaveId,"leaveState":leaveState }
+  })
+}
+
+export function getOlderInformation(id){
+  return request({
+    url: '/olderLeave/olderInformation',
+    method: 'get',
+    params: { "relationId":id }
   })
 }

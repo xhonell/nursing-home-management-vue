@@ -1,7 +1,7 @@
 import { login, logout, getInfo, resetUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { getDoctorInformation } from '@/api/leave'
+import { getDoctorInformation ,getOlderInformation } from '@/api/leave'
 
 const state = {
   token: getToken(),
@@ -9,6 +9,8 @@ const state = {
   avatar: '',
   id: '',
   doctorId: '',
+  olderId: '',
+  relationId: '',
   roles: []
 }
 
@@ -30,6 +32,12 @@ const mutations = {
   },
   SET_DOCTORID: (state, doctorId) => {
     state.doctorId = doctorId
+  },
+  SET_OLDER: (state, olderId) => {
+    state.olderId = olderId
+  },
+  SET_RELATION: (state, relationId) => {
+    state.relationId = relationId
   }
 }
 
@@ -69,6 +77,8 @@ const actions = {
         commit('SET_ROLES', rolePrivileges)
         if (rolePrivileges.includes('医护人员')) {
           dispatch('getDoctorInfo', roleId)
+        } else if (rolePrivileges.includes('家属')) {
+          dispatch('getOlderInfo', roleId)
         }
         commit('SET_ID', roleId)
         commit('SET_NAME', roleName)
@@ -129,6 +139,22 @@ const actions = {
         const { data } = response
         if (this.state.user.doctorId === "" || this.state.user.doctorId !== data.doctorId) {
           commit('SET_DOCTORID', data.doctorId)
+        }
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  getOlderInfo({ commit }, roleId) {
+    return new Promise(async (resolve, reject) => {
+      await getOlderInformation(roleId).then(response => {
+        const { data } = response
+        if (this.state.user.olderId === "" || this.state.user.olderId !== data.olderId) {
+          commit('SET_OLDER', data.olderId)
+        }
+        if (this.state.user.relationId === "" || this.state.user.relationId !== data.relationId){
+          commit('SET_RELATION', data.relationId)
         }
         resolve(data)
       }).catch(error => {
