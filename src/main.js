@@ -19,6 +19,10 @@ import './permission' // permission control
 import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
+// 全局引入EChars相关包
+import * as echarts from 'echarts'
+// 开启echarts
+Vue.prototype.$echarts = echarts
 
 /**
  * If you don't want to use mock-server

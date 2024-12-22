@@ -9,14 +9,14 @@
         @keyup.enter.native="handleFilter"
       />
       <el-select v-model="listQuery.healthState" class="filter-item" placeholder="请选择">
-        <el-option v-for="item in state" :key="item" :label="item" :value="item"></el-option>
+        <el-option v-for="item in state" :key="item" :label="item" :value="item" />
       </el-select>
       <el-date-picker
         v-model="listQuery.healthTime"
         type="datetime"
         class="filter-item"
         placeholder="选择日期时间"
-      ></el-date-picker>
+      />
 
       <el-button
         v-waves
@@ -78,7 +78,7 @@
       </el-table-column>
       <el-table-column label="心率" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthHeart}}</span>
+          <span>{{ row.healthHeart }}</span>
         </template>
       </el-table-column>
       <el-table-column label="记录时间" min-width="150px" align="center">
@@ -99,7 +99,7 @@
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="330"
+        width="230"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{row}">
@@ -137,7 +137,7 @@
         </el-form-item>
         <el-form-item label="健康状态" prop="healthState">
           <el-select v-model="temp.healthState" placeholder="请选择">
-            <el-option v-for="item in state" :key="item" :label="item" :value="item"></el-option>
+            <el-option v-for="item in state" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
         <el-form-item label="身高" prop="healthHeight">
@@ -156,13 +156,13 @@
           <el-date-picker v-model="temp.healthTime" type="datetime" placeholder="请选择一个时间" />
         </el-form-item>
         <el-form-item label="老人编号" hidden>
-          <el-select v-model="temp.olderId"  placeholder="请选择" @change="onOlderIdChange">
-            <el-option v-for="(item,index) in olderIds" :key="index" :label="item" :value="item"></el-option>
+          <el-select v-model="temp.olderId" placeholder="请选择" @change="onOlderIdChange">
+            <el-option v-for="(item,index) in olderIds" :key="index" :label="item" :value="item" />
           </el-select>
         </el-form-item>
         <el-form-item label="老人名称" prop="olderName">
-          <el-select v-model="temp.olderName"  placeholder="请选择"  @change="onOlderNameChange">
-            <el-option v-for="(item,index) in olderNames" :key="index" :label="item" :value="item"></el-option>
+          <el-select v-model="temp.olderName" placeholder="请选择" @change="onOlderNameChange">
+            <el-option v-for="(item,index) in olderNames" :key="index" :label="item" :value="item" />
           </el-select>
         </el-form-item>
         <el-form-item label="医师编号" hidden>
@@ -201,21 +201,21 @@ import {
   updateArticle,
   deleteArticle,
   getOlderName
-} from "@/api/health";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import { mapGetters } from "vuex";
+} from '@/api/health'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "ComplexTable",
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   data() {
     return {
       olderNames: [],
       olderIds: [],
-      state: ["正常", "感冒", "发烧", "隔离"],
+      state: ['正常', '感冒', '发烧', '隔离'],
       tableKey: 0,
       list: null,
       total: 0,
@@ -229,246 +229,246 @@ export default {
       },
       temp: {
         healthId: undefined,
-        healthState: "",
+        healthState: '',
         healthHeight: undefined,
         healthWeight: undefined,
         healthBlood: undefined,
         healthHeart: undefined,
         healthTime: new Date(),
         olderId: undefined,
-        olderName: "",
+        olderName: '',
         doctorId: undefined,
-        doctorName: ""
+        doctorName: ''
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "修改",
-        create: "创建"
+        update: '修改',
+        create: '创建'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         healthTime: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "时间不能为空",
-            trigger: "change"
+            message: '时间不能为空',
+            trigger: 'change'
           }
         ],
         healthState: [
-          { required: true, message: "健康状态不能为空", trigger: "blur" }
+          { required: true, message: '健康状态不能为空', trigger: 'blur' }
         ],
-        healthBlood:[
-          { required: true, message: "血压不能为空", trigger: "blur" }
+        healthBlood: [
+          { required: true, message: '血压不能为空', trigger: 'blur' }
         ],
-        healthHeart:[
-          { required: true, message: "心率不能为空", trigger: "blur" }
+        healthHeart: [
+          { required: true, message: '心率不能为空', trigger: 'blur' }
         ],
-        healthWeight:[
-          { required: true, message: "体重不能为空", trigger: "blur" }
+        healthWeight: [
+          { required: true, message: '体重不能为空', trigger: 'blur' }
         ],
-        healthHeight:[
-          { required: true, message: "身高不能为空", trigger: "blur" }
+        healthHeight: [
+          { required: true, message: '身高不能为空', trigger: 'blur' }
         ],
         olderName: [
-          { required: true, message: "老人姓名不能为空", trigger: "blur" }
+          { required: true, message: '老人姓名不能为空', trigger: 'blur' }
         ]
       },
       downloadLoading: false
-    };
+    }
   },
   watch: {
     // 当olderId变化时，更新olderName
     'temp.olderId': function(newId) {
-      const index = this.olderIds.indexOf(newId);
+      const index = this.olderIds.indexOf(newId)
       if (index !== -1) {
-        this.temp.olderName = this.olderNames[index]; // 同步更新老人名称
+        this.temp.olderName = this.olderNames[index] // 同步更新老人名称
       }
     },
     // 当olderName变化时，更新olderId
     'temp.olderName': function(newName) {
-      const index = this.olderNames.indexOf(newName);
+      const index = this.olderNames.indexOf(newName)
       if (index !== -1) {
-        this.temp.olderId = this.olderIds[index]; // 同步更新老人编号
+        this.temp.olderId = this.olderIds[index] // 同步更新老人编号
       }
-    },
+    }
   },
   computed: {
-    ...mapGetters(["name", "id"])
+    ...mapGetters(['name', 'id'])
   },
   created() {
-    this.getList();
-    this.getOlders();
+    this.getList()
+    this.getOlders()
   },
   methods: {
     onOlderIdChange(value) {
-      const index = this.olderIds.indexOf(value);
+      const index = this.olderIds.indexOf(value)
       if (index !== -1) {
-        this.temp.olderName = this.olderNames[index];
+        this.temp.olderName = this.olderNames[index]
       }
     },
     onOlderNameChange(value) {
-      const index = this.olderNames.indexOf(value);
+      const index = this.olderNames.indexOf(value)
       if (index !== -1) {
-        this.temp.olderId = this.olderIds[index];
+        this.temp.olderId = this.olderIds[index]
       }
     },
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.healthList;
-        this.total = response.data.total;
+        this.list = response.data.healthList
+        this.total = response.data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     resetTemp() {
       this.temp = {
         healthId: undefined,
-        healthState: "",
+        healthState: '',
         healthHeight: undefined,
         healthWeight: undefined,
         healthBlood: undefined,
         healthHeart: undefined,
         healthTime: new Date(),
         olderId: undefined,
-        olderName: "",
+        olderName: '',
         doctorId: undefined,
-        doctorName: ""
-      };
+        doctorName: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-        this.temp.doctorId = this.id;
-        this.temp.doctorName = this.name;
-      });
+        this.$refs['dataForm'].clearValidate()
+        this.temp.doctorId = this.id
+        this.temp.doctorName = this.name
+      })
     },
     createData() {
-      this.$refs["dataForm"].validate(valid => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
           createArticle(this.temp).then(response => {
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
+              title: '成功',
               message: response.msg,
-              type: "success"
-            });
-            this.getList();
-          });
+              type: 'success'
+            })
+            this.getList()
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.dietTime = new Date(this.temp.dietTime);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.dietTime = new Date(this.temp.dietTime)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      this.$refs["dataForm"].validate(valid => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.dietTime = +new Date(tempData.dietTime); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          const tempData = Object.assign({}, this.temp)
+          tempData.dietTime = +new Date(tempData.dietTime) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then(response => {
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
+              title: '成功',
               message: response.msg,
-              type: "success"
-            });
-            this.getList();
-          });
+              type: 'success'
+            })
+            this.getList()
+          })
         }
-      });
+      })
     },
     getOlders() {
       getOlderName().then(response => {
-        const { data } = response;
-        this.olderIds = data.olderIds;
-        this.olderNames = data.olderNames;
-      });
+        const { data } = response
+        this.olderIds = data.olderIds
+        this.olderNames = data.olderNames
+      })
     },
     handleDelete(row) {
       deleteArticle(row.healthId).then(response => {
         this.$notify({
-          title: "成功",
+          title: '成功',
           message: response.msg,
-          type: "success"
-        });
-        this.getList();
-      });
+          type: 'success'
+        })
+        this.getList()
+      })
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then(excel => {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then(excel => {
         const tHeader = [
-          "档案编号",
-          "身体状况",
-          "身高",
-          "体重",
-          "血压",
-          "心率",
-          "记录时间",
-          "老人编号",
-          "老人姓名",
-          "医生编号",
-          "医生姓名"
-        ];
+          '档案编号',
+          '身体状况',
+          '身高',
+          '体重',
+          '血压',
+          '心率',
+          '记录时间',
+          '老人编号',
+          '老人姓名',
+          '医生编号',
+          '医生姓名'
+        ]
         const filterVal = [
-          "healthId",
-          "healthState",
-          "healthHeight",
-          "healthWeight",
-          "healthBlood",
-          "healthHeart",
-          "healthTime",
-          "olderId",
-          "olderName",
-          "doctorId",
-          "doctorName"
-        ];
-        const data = this.formatJson(filterVal);
+          'healthId',
+          'healthState',
+          'healthHeight',
+          'healthWeight',
+          'healthBlood',
+          'healthHeart',
+          'healthTime',
+          'olderId',
+          'olderName',
+          'doctorId',
+          'doctorName'
+        ]
+        const data = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "健康档案表表"
-        });
-        this.downloadLoading = false;
-      });
+          filename: '健康档案表表'
+        })
+        this.downloadLoading = false
+      })
     },
     formatJson(filterVal) {
       return this.list.map(v =>
         filterVal.map(j => {
-          if (j === "healthTime") {
-            return parseTime(v[j]);
+          if (j === 'healthTime') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     }
   }
-};
+}
 </script>
