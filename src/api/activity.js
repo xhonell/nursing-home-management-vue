@@ -9,10 +9,11 @@ export function fetchList(query) {
 }
 
 export function deleteArticle(id) {
+  console.log(id)
   return request({
-    url: '/file/delete',
+    url: '/activity/delete',
     method: 'get',
-    params: { 'fileId': id }
+    params: { 'activityId': id }
   })
 }
 
@@ -34,7 +35,7 @@ export function fetchPv(pv) {
 
 export function createArticle(data) {
   return request({
-    url: '/file/insert',
+    url: '/activity/insert',
     method: 'get',
     params: data
   })
@@ -42,7 +43,7 @@ export function createArticle(data) {
 
 export function updateArticle(data) {
   return request({
-    url: '/file/update',
+    url: '/activity/update',
     method: 'get',
     params: data
   })
