@@ -159,6 +159,7 @@ export default {
               this.form = data
               this.reset = data
             })
+          this.$router.push('/')
         } else {
           return false
         }
