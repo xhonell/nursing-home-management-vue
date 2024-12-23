@@ -213,7 +213,7 @@ export default {
 .map-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* 使容器占满整个视口 */
+  height: 89.7vh; /* 使容器占满整个视口 */
 }
 
 #container {
