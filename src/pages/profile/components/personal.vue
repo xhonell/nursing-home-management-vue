@@ -156,7 +156,6 @@ export default {
                 message: response.msg,
                 type: 'success'
               })
-              console.log(data)
               this.form = data
               this.reset = data
             })

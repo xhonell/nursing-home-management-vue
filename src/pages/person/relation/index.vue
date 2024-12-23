@@ -1,9 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.relationName" placeholder="家属姓名" style="width: 200px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.relationship" placeholder="与老人关系" style="width: 200px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.olderName" placeholder="老人姓名" style="width: 200px ;margin-left: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.relationName" placeholder="家属姓名" style="width: 160px ;" clearable class="filter-item" @change="handleFilter" />
+      <el-input v-model="listQuery.olderName" placeholder="老人姓名" style="width: 160px ;margin-left: 10px;" clearable class="filter-item" @change="handleFilter" />
+      <el-select v-model="listQuery.relationship" placeholder="关系" clearable class="filter-item" style="width: 160px;margin-left: 10px;" @change="handleFilter">
+        <el-option v-for="item in relationshipList" :key="item.relationship" :label="item.relationship" :value="item.relationship" />
+      </el-select>
       <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         {{ $t('table.search') }}
       </el-button>
@@ -24,41 +26,40 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
-    >
-      <el-table-column label="编号" prop="relationId" sortable="custom" align="center" width="160" :class-name="getSortClass('relationId')">
-        <template slot-scope="{row}">
-          <span>{{ row.relationId }}</span>
+      @sort-change="sortChange">
+      <el-table-column label="编号" align="center" width="150" >
+        <template slot-scope="scope">
+          <span>{{((listQuery.page - 1) * listQuery.limit) + (scope.$index + 1)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="姓名" prop="relationName" sortable="custom" align="center" width="160">
+      <el-table-column label="家属姓名" prop="relationName" sortable="custom" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.relationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="关系" prop="relationship" sortable="custom" align="center" width="500">
+      <el-table-column label="老人姓名" prop="olderName" sortable="custom" align="center" width="150">
+        <template slot-scope="{row}">
+          <span>{{ row.olderName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="关系" prop="relationship" sortable="custom" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.relationship }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="电话号码" prop="relationPhone" sortable="custom" align="center" width="500">
+      <el-table-column label="电话号码" prop="relationPhone" sortable="custom" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.relationPhone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="家庭地址" prop="relationAddress" sortable="custom" align="center" width="500">
-        <template slot-scope="{row}">
-          <span>{{ row.relationAddress }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="邮箱" prop="relationEmail" sortable="custom" align="center" width="500">
+      <el-table-column label="邮箱" prop="relationEmail" sortable="custom" align="center" width="220">
         <template slot-scope="{row}">
           <span>{{ row.relationEmail }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="老人姓名" prop="olderName" sortable="custom" align="center" width="500">
+      <el-table-column label="地址" prop="relationAddress" sortable="custom" align="center" width="220">
         <template slot-scope="{row}">
-          <span>{{ row.olderName }}</span>
+          <span>{{ row.relationAddress }}</span>
         </template>
       </el-table-column>
 
@@ -79,26 +80,28 @@
     <!--修改的表单-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="编号">
+        <el-form-item label="编号" hidden>
           <el-input v-model="temp.relationId" :autosize="{ minRows: 2, maxRows: 4}" retype="text" readonly />
         </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="temp.relationName" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入姓名" />
-        </el-form-item>
-        <el-form-item label="关系">
-          <el-input v-model="temp.relationship" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入与老人的关系" />
-        </el-form-item>
-        <el-form-item label="电话号码">
-          <el-input v-model="temp.relationPhone" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入电话号码" />
-        </el-form-item>
-        <el-form-item label="家庭地址">
-          <el-input v-model="temp.relationAddress" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入家庭地址" />
-        </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="temp.relationEmail" :autosize="{ minRows: 2, maxRows: 4}" type="text" placeholder="请输入邮箱" />
+        <el-form-item label="家属姓名" prop="relationName">
+          <el-input v-model="temp.relationName" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入家属姓名" />
         </el-form-item>
         <el-form-item label="老人姓名">
-          <el-input v-model="temp.olderName" :autosize="{ minRows: 2, maxRows: 4}" type="dateTime" placeholder="请输入老人姓名" />
+          <el-input v-model="temp.olderName" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入老人姓名" />
+        </el-form-item>
+        <el-form-item label="关系">
+          <el-select v-model="temp.relationship" placeholder="关系" clearable class="filter-item" style="width: 130px;margin-left: 10px;">
+            <el-option v-for="item in relationshipList" :key="item.relationship" :label="item.relationship" :value="item.relationship" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="电话号码" class="no-wrap-label">
+          <el-input v-model="temp.relationPhone" :autosize="{ minRows: 2, maxRows: 4}" type="text" style="width: 310px; margin-left: 20px;" clearable placeholder="请输入电话号码" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="temp.relationEmail" :autosize="{ minRows: 2, maxRows: 4}" type="text" clearable placeholder="请输入邮箱" />
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="temp.relationAddress" :autosize="{ minRows: 2, maxRows: 4}" type="textLine" clearable placeholder="请输入地址" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -124,7 +127,7 @@
 </template>
 
 <script>
-import { findByPage, deleteRelation, addRelation, updateRelation } from '@/api/person/relation'
+import { findByPage, deleteRelation, addRelation, updateRelation, findAllRelationshipList } from '@/api/person/relation'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -133,6 +136,8 @@ export default {
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
+  filters: {
+  },
   data() {
     return {
       tableKey: 0,
@@ -142,26 +147,27 @@ export default {
       listQuery: { // 查询数据
         page: 1,
         limit: 10,
-        relationName: undefined,
-        relationship: undefined,
-        olderName: undefined
+        relationName: '',
+        olderName:'',
+        relationship:''
       },
+      relationshipList: null,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       showReviewer: false,
       temp: { // 修改数据
         relationId: undefined,
         relationName: '',
+        olderName:'',
         relationship: '',
-        relationPhone: '',
-        relationAddress: '',
-        relationEmail: '',
-        olderName: ''
+        relationPhone:'',
+        relationEmail:'',
+        relationAddress:''
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: '修改',
-        create: '添加'
+        update: '修改家属信息',
+        create: '添加家属信息'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -173,6 +179,7 @@ export default {
   },
   created() { // 数据加载之后，页面渲染之前
     this.getList()
+    this.getrelationshipList()
   },
   methods: {
     // 获取列表数据
@@ -181,6 +188,16 @@ export default {
       findByPage(this.listQuery).then(response => {
         this.list = response.data.relationList
         this.total = response.data.total
+        setTimeout(() => {
+          this.listLoading = false
+        })
+      })
+    },
+    // 获取关系列表
+    getrelationshipList() {
+      this.listLoading = true
+      findAllRelationshipList().then(response => {
+        this.relationshipList = response.data.relationshipList
         setTimeout(() => {
           this.listLoading = false
         })
@@ -217,11 +234,11 @@ export default {
       this.temp = {
         relationId: undefined,
         relationName: '',
+        olderName:'',
         relationship: '',
-        relationPhone: '',
-        relationAddress: '',
-        relationEmail: '',
-        olderName: ''
+        relationPhone:'',
+        relationEmail:'',
+        relationAddress:''
       }
     },
 
@@ -258,7 +275,6 @@ export default {
     // 修改，弹出修改表单
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -334,3 +350,16 @@ export default {
 }
 </script>
 
+<style>
+.popover-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
+
+<style>
+.no-wrap-label .el-form-item__label {
+  white-space: nowrap;
+}
+</style>

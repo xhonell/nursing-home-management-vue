@@ -1,23 +1,26 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
+      <!--
+        1.修改搜索条件
+        v-model="listQuery.修改列名"
+        placeholder="中文列名"
+        v-->
       <el-input
-        v-model="listQuery.olderName"
-        placeholder="老人名称"
+        v-model="listQuery.goodsName"
+        placeholder="物资名称"
         style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select v-model="listQuery.healthState" class="filter-item" placeholder="请选择">
-        <el-option v-for="item in state" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-date-picker
-        v-model="listQuery.healthTime"
-        type="datetime"
+      <el-input
+        v-model="listQuery.classifyName"
+        placeholder="物资分类"
+        style="width: 200px;"
         class="filter-item"
-        placeholder="选择日期时间"
+        @keyup.enter.native="handleFilter"
       />
-
+      <!-- 1.在这里之前修改 -->
       <el-button
         v-waves
         class="filter-item"
@@ -51,55 +54,60 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column label="记录编号" prop="healthId" align="center" width="80">
+      <!--
+        2.在这里修改列名
+        label="修改中文列名"
+        <span>{{ row.修改字段 }}</span>
+        一个el-table-column和template是一个整体
+      -->
+      <el-table-column
+        label="物资编号"
+        align="center"
+        width="80"
+      >
         <template slot-scope="{row}">
-          <span>{{ row.healthId }}</span>
+          <span>{{ row.goodsId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="健康状态" width="110px" align="center">
+      <el-table-column label="物资名称" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthState }}</span>
+          <span>{{ row.goodsName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="身高" width="110px" align="center">
+      <el-table-column label="物资单价" min-width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthHeight }}</span>
+          <span>{{ row.goodsPrice }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="体重" width="110px" align="center">
+      <el-table-column label="物资总数量" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthWeight }}</span>
+          <span>{{ row.goodsNumber }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="血压" width="110px" align="center">
+      <el-table-column label="物资剩余数量" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthBlood }}</span>
+          <span>{{ row.goodsInDepot }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="心率" width="110px" align="center">
+      <el-table-column label="物资供应商" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthHeart }}</span>
+          <span>{{ row.goodsProvider }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="记录时间" min-width="150px" align="center">
+      <el-table-column label="物资入库时间" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.goodsStartTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="老人名称" width="110px" align="center">
+      <el-table-column label="物资分类" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.olderName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="负责医师" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.doctorName }}</span>
+          <span>{{ row.classifyName }}</span>
         </template>
       </el-table-column>
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="230"
+        width="330"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{row}">
@@ -132,44 +140,39 @@
         label-width="100px"
         style="width: 40  0px; margin-left:50px;"
       >
-        <el-form-item label="记录编号" hidden>
-          <el-input v-model="temp.healthId" />
+        <!--
+        3.在这里修改表单
+        <el-form-item label='修改列名中文' hidden>
+        <el-input v-model="temp.修改列名" />
+        -->
+        <el-form-item label="物资编号" hidden>
+          <el-input v-model="temp.goodsId" />
         </el-form-item>
-        <el-form-item label="健康状态" prop="healthState">
-          <el-select v-model="temp.healthState" placeholder="请选择">
-            <el-option v-for="item in state" :key="item" :label="item" :value="item" />
-          </el-select>
+        <el-form-item label="物资名称" prop="equipName">
+          <el-input v-model="temp.goodsName" placeholder="请填写物资名称" />
         </el-form-item>
-        <el-form-item label="身高" prop="healthHeight">
-          <el-input v-model="temp.healthHeight" />
+        <el-form-item label="物资单价">
+          <el-input v-model="temp.goodsPrice" placeholder="请填写物资单价" />
         </el-form-item>
-        <el-form-item label="体重" prop="healthWeight">
-          <el-input v-model="temp.healthWeight" />
+        <el-form-item label="物资总数量">
+          <el-input v-model="temp.goodsNumber" placeholder="请填写物资总数量" />
         </el-form-item>
-        <el-form-item label="血压" prop="healthBlood">
-          <el-input v-model="temp.healthBlood" />
+        <el-form-item label="物资剩余数量">
+          <el-input v-model="temp.goodsInDepot" placeholder="请填写物资剩余数量" />
         </el-form-item>
-        <el-form-item label="心率" prop="healthHeart">
-          <el-input v-model="temp.healthHeart" />
+        <el-form-item label="物资供应商">
+          <el-input v-model="temp.goodsProvider" placeholder="请填写物资供应商" />
         </el-form-item>
-        <el-form-item label="记录时间" prop="healthTime">
-          <el-date-picker v-model="temp.healthTime" type="datetime" placeholder="请选择一个时间" />
+        <el-form-item label="物资入库时间">
+          <el-input
+            v-model="temp.goodsStartTime"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="请选择物资入库时间"
+          />
         </el-form-item>
-        <el-form-item label="老人编号" hidden>
-          <el-select v-model="temp.olderId" placeholder="请选择" @change="onOlderIdChange">
-            <el-option v-for="(item,index) in olderIds" :key="index" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="老人名称" prop="olderName">
-          <el-select v-model="temp.olderName" placeholder="请选择" @change="onOlderNameChange">
-            <el-option v-for="(item,index) in olderNames" :key="index" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="医师编号" hidden>
-          <el-input v-model="temp.doctorId" />
-        </el-form-item>
-        <el-form-item label="填写医师">
-          <el-input v-model="temp.doctorName" readonly />
+        <el-form-item label="物资分类">
+          <el-input v-model="temp.classifyName" placeholder="请选择物资分类" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -195,27 +198,23 @@
 
 <script>
 import {
-  fetchList,
-  fetchPv,
   createArticle,
-  updateArticle,
   deleteArticle,
-  getOlderName
-} from '@/api/health'
+  fetchList,
+  updateArticle
+} from '@/api/equip'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { mapGetters } from 'vuex'
 
 export default {
+
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   data() {
     return {
-      olderNames: [],
-      olderIds: [],
-      state: ['正常', '感冒', '发烧', '隔离'],
       tableKey: 0,
       list: null,
       total: 0,
@@ -223,22 +222,20 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        healthState: undefined,
-        olderName: undefined,
-        healthTime: undefined
+        // 4.添加数据库搜索条件 （上面两个不动）
+        // 修改列名: undefined,Name
+        goodsName: undefined,
+        classifyName: undefined
       },
       temp: {
-        healthId: undefined,
-        healthState: '',
-        healthHeight: undefined,
-        healthWeight: undefined,
-        healthBlood: undefined,
-        healthHeart: undefined,
-        healthTime: new Date(),
-        olderId: undefined,
-        olderName: '',
-        doctorId: undefined,
-        doctorName: ''
+        goodsId: undefined,
+        goodsName: '',
+        goodsPrice: '',
+        goodsNumber: '',
+        goodsInDepot: '',
+        goodsProvider: '',
+        goodsStartTime: '',
+        NameclassifyName: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -249,7 +246,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        healthTime: [
+        dietTime: [
           {
             type: 'date',
             required: true,
@@ -257,69 +254,28 @@ export default {
             trigger: 'change'
           }
         ],
-        healthState: [
-          { required: true, message: '健康状态不能为空', trigger: 'blur' }
-        ],
-        healthBlood: [
-          { required: true, message: '血压不能为空', trigger: 'blur' }
-        ],
-        healthHeart: [
-          { required: true, message: '心率不能为空', trigger: 'blur' }
-        ],
-        healthWeight: [
-          { required: true, message: '体重不能为空', trigger: 'blur' }
-        ],
-        healthHeight: [
-          { required: true, message: '身高不能为空', trigger: 'blur' }
-        ],
-        olderName: [
-          { required: true, message: '老人姓名不能为空', trigger: 'blur' }
+        dietFood: [
+          { required: true, message: '膳食内容不能为空', trigger: 'blur' }
         ]
       },
       downloadLoading: false
     }
   },
-  watch: {
-    // 当olderId变化时，更新olderName
-    'temp.olderId': function(newId) {
-      const index = this.olderIds.indexOf(newId)
-      if (index !== -1) {
-        this.temp.olderName = this.olderNames[index] // 同步更新老人名称
-      }
-    },
-    // 当olderName变化时，更新olderId
-    'temp.olderName': function(newName) {
-      const index = this.olderNames.indexOf(newName)
-      if (index !== -1) {
-        this.temp.olderId = this.olderIds[index] // 同步更新老人编号
-      }
-    }
-  },
   computed: {
-    ...mapGetters(['name', 'id'])
+    ...mapGetters([
+      'name',
+      'id'
+    ])
   },
   created() {
     this.getList()
-    this.getOlders()
   },
   methods: {
-    onOlderIdChange(value) {
-      const index = this.olderIds.indexOf(value)
-      if (index !== -1) {
-        this.temp.olderName = this.olderNames[index]
-      }
-    },
-    onOlderNameChange(value) {
-      const index = this.olderNames.indexOf(value)
-      if (index !== -1) {
-        this.temp.olderId = this.olderIds[index]
-      }
-    },
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.healthList
-        this.total = response.data.total
+        this.list = response.data
+        this.total = 40
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -333,16 +289,9 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        healthId: undefined,
-        healthState: '',
-        healthHeight: undefined,
-        healthWeight: undefined,
-        healthBlood: undefined,
-        healthHeart: undefined,
-        healthTime: new Date(),
-        olderId: undefined,
-        olderName: '',
-        doctorId: undefined,
+        dietId: undefined,
+        dietFood: '',
+        dietTime: new Date(),
         doctorName: ''
       }
     },
@@ -397,15 +346,8 @@ export default {
         }
       })
     },
-    getOlders() {
-      getOlderName().then(response => {
-        const { data } = response
-        this.olderIds = data.olderIds
-        this.olderNames = data.olderNames
-      })
-    },
     handleDelete(row) {
-      deleteArticle(row.healthId).then(response => {
+      deleteArticle(row.dietId).then(response => {
         this.$notify({
           title: '成功',
           message: response.msg,
@@ -423,29 +365,11 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = [
-          '档案编号',
-          '身体状况',
-          '身高',
-          '体重',
-          '血压',
-          '心率',
-          '记录时间',
-          '老人编号',
-          '老人姓名',
-          '医生编号',
-          '医生姓名'
-        ]
+        const tHeader = ['膳食序号', '当天时间', '膳食内容', '医师编号', '负责医师']
         const filterVal = [
-          'healthId',
-          'healthState',
-          'healthHeight',
-          'healthWeight',
-          'healthBlood',
-          'healthHeart',
-          'healthTime',
-          'olderId',
-          'olderName',
+          'dietId',
+          'dietTime',
+          'dietFood',
           'doctorId',
           'doctorName'
         ]
@@ -453,7 +377,7 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: '健康档案表表'
+          filename: '膳食信息表'
         })
         this.downloadLoading = false
       })
@@ -461,7 +385,7 @@ export default {
     formatJson(filterVal) {
       return this.list.map(v =>
         filterVal.map(j => {
-          if (j === 'healthTime') {
+          if (j === 'dietTime') {
             return parseTime(v[j])
           } else {
             return v[j]
