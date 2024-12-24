@@ -69,17 +69,17 @@
           <span>{{ row.gradeId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="医护服务等级" min-width="110px" align="center">
+      <el-table-column label="医护服务等级" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.gradeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="医护服务内容" width="800px" align="center">
+      <el-table-column label="医护服务内容" max-width="750px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.gradeContent }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="医护收费标准" min-width="110px" align="center">
+      <el-table-column label="医护收费标准" width="110px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.gradeCharge }}</span>
         </template>
@@ -88,7 +88,7 @@
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="330"
+        width="200"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{row}">
