@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h3>小组成员</h3>
-    <div v-for="item in menber" :key="item" style="margin-bottom:10px;">
+    <div v-for="item in menber" :key="item.name" style="margin-bottom:10px;">
       <el-row>
         <el-col :span="11" style="text-align:left;" :offset="2">姓名：{{ item.name }}</el-col>
         <el-col :span="10">职位：{{ item.position }}</el-col>

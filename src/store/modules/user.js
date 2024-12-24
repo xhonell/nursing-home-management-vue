@@ -1,7 +1,7 @@
 import { login, logout, getInfo, resetUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { getDoctorInformation ,getOlderInformation } from '@/api/leave'
+import { getDoctorInformation, getOlderInformation } from '@/api/leave'
 
 const state = {
   token: getToken(),
@@ -96,6 +96,12 @@ const actions = {
       logout(state.token).then(() => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
+        commit('SET_ID', '')
+        commit('SET_DOCTORID', '')
+        commit('SET_OLDER', '')
+        commit('SET_RELATION', '')
+        commit('SET_NAME', '')
+        commit('SET_AVATAR', '')
         removeToken()
         resetRouter()
 
@@ -134,10 +140,10 @@ const actions = {
   },
 
   getDoctorInfo({ commit }, roleId) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       await getDoctorInformation(roleId).then(response => {
         const { data } = response
-        if (this.state.user.doctorId === "" || this.state.user.doctorId !== data.doctorId) {
+        if (this.state.user.doctorId === '' || this.state.user.doctorId !== data.doctorId) {
           commit('SET_DOCTORID', data.doctorId)
         }
         resolve(data)
@@ -147,13 +153,13 @@ const actions = {
     })
   },
   getOlderInfo({ commit }, roleId) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       await getOlderInformation(roleId).then(response => {
         const { data } = response
-        if (this.state.user.olderId === "" || this.state.user.olderId !== data.olderId) {
+        if (this.state.user.olderId === '' || this.state.user.olderId !== data.olderId) {
           commit('SET_OLDER', data.olderId)
         }
-        if (this.state.user.relationId === "" || this.state.user.relationId !== data.relationId){
+        if (this.state.user.relationId === '' || this.state.user.relationId !== data.relationId) {
           commit('SET_RELATION', data.relationId)
         }
         resolve(data)
@@ -182,7 +188,6 @@ const actions = {
     // reset visited views and cached views
     dispatch('tagsView/delAllViews', null, { root: true })
   }
-
 
 }
 
