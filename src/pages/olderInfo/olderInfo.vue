@@ -70,7 +70,6 @@ export default {
       dialogVisible: false,
       hasAvatar: false, // 新增状态变量
       form: {
-        relationId: '',
         olderName: '',
         olderAge: '',
         olderPhone: '',
