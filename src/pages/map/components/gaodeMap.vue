@@ -1,8 +1,7 @@
 <template>
   <div class="map-container">
     <div id="container">这是地图接口</div>
-    <div id="route-panel" class="route-panel" />
-    <!-- 路线信息显示面板 -->
+    <div id="route-panel" class="route-panel" /> <!-- 路线信息面板 -->
   </div>
 </template>
 
@@ -16,7 +15,8 @@ export default {
       map: null,
       marker: null, // 当前用户位置的标记
       nursingHomeMarker: null, // 养老院位置的标记
-      drivingRoute: null // 路线规划对象
+      drivingRoute: null, // 路线规划对象
+      routePanelErrorMessage: '' // 存储错误消息
     }
   },
   computed: {
@@ -49,7 +49,7 @@ export default {
         this.addNursingHomeMarker(AMap)
       })
       .catch(e => {
-        console.error(e)
+        console.error('地图或插件加载失败:', e)
       })
   },
   methods: {
@@ -58,6 +58,9 @@ export default {
         navigator.geolocation.getCurrentPosition(
           position => {
             const { latitude, longitude } = position.coords
+
+            // 打印获取到的定位坐标
+            console.log('定位成功，获取的起点坐标：', { latitude, longitude })
 
             // 设置地图中心点为当前位置
             this.map.setCenter([longitude, latitude])
@@ -92,6 +95,7 @@ export default {
           },
           error => {
             console.error('定位失败: ', error)
+            alert('定位失败: ' + error.message)
             // 定位失败后使用默认位置
             this.map.setCenter([116.397428, 39.90923])
 
@@ -116,7 +120,7 @@ export default {
           }
         )
       } else {
-        console.error('浏览器不支持定位功能')
+        this.$message.error('定位失败，请手动查看定位信息！')
         // 如果浏览器不支持定位，使用默认位置
         this.map.setCenter([116.397428, 39.90923])
 
@@ -199,9 +203,17 @@ export default {
 
       driving.search(startPosition, nursingHomePosition, (status, result) => {
         if (status === 'complete') {
-          console.log('路线规划成功')
+          this.$message({
+            showClose: true,
+            message: '路线规划成功',
+            type: 'success'
+          })
         } else {
-          console.error('路线规划失败: ', result)
+          this.$message({
+            showClose: true,
+            message: '路线规划失败',
+            type: 'error'
+          })
         }
       })
     }
@@ -209,7 +221,7 @@ export default {
 }
 </script>
 
-  <style>
+<style>
 .map-container {
   display: flex;
   flex-direction: column;
@@ -228,5 +240,12 @@ export default {
   background-color: rgba(255, 255, 255, 0.9);
   position: relative;
   z-index: 10;
+}
+
+/* 错误消息 */
+.route-panel.error {
+  background-color: rgba(255, 0, 0, 0.5);
+  color: white;
+  padding: 10px;
 }
 </style>
