@@ -1,26 +1,30 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!--
-        1.修改搜索条件
-        v-model="listQuery.修改列名"
-        placeholder="中文列名"
-        v-->
       <el-input
-        v-model="listQuery.gradeName"
-        placeholder="医护等级名称"
-        style="width: 200px;"
+        v-model="listQuery.roomName"
         class="filter-item"
+        style="width: 200px;"
+        placeholder="房间号"
         @keyup.enter.native="handleFilter"
       />
+
       <el-input
-        v-model="listQuery.gradeContent"
-        placeholder="医护服务内容"
-        style="width: 200px;"
+        v-model="listQuery.doctorName"
         class="filter-item"
+        style="width: 200px;"
+        placeholder="医生姓名"
         @keyup.enter.native="handleFilter"
       />
-      <!-- 1.在这里之前修改 -->
+
+      <el-input
+        v-model="listQuery.olderName"
+        class="filter-item"
+        style="width: 200px;"
+        placeholder="老人姓名"
+        @keyup.enter.native="handleFilter"
+      />
+
       <el-button
         v-waves
         class="filter-item"
@@ -44,7 +48,7 @@
         @click="handleDownload"
       >{{ $t('table.export') }}</el-button>
     </div>
-
+    <!-- 头显示 -->
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -54,41 +58,39 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <!--
-        2.在这里修改列名
-        label="修改中文列名"
-        <span>{{ row.修改字段 }}</span>
-        一个el-table-column和template是一个整体
-      -->
       <el-table-column
-        label="医护等级编号"
+        label="房间编号"
         align="center"
-        width="120"
+        width="80"
       >
         <template slot-scope="{row}">
-          <span>{{ row.gradeId }}</span>
+          <span>{{ row.roomId }}</span>
         </template>
+
       </el-table-column>
-      <el-table-column label="医护服务等级" width="150px" align="center">
+      <el-table-column label="房间名字" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.gradeName }}</span>
+          <span>{{ row.roomName }}</span>
         </template>
+
       </el-table-column>
-      <el-table-column label="医护服务内容" max-width="750px" align="center">
+      <el-table-column label="医生名字" min-width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.gradeContent }}</span>
+          <span>{{ row.doctorName }}</span>
         </template>
+
       </el-table-column>
-      <el-table-column label="医护收费标准" width="110px" align="center">
+      <el-table-column label="老人名字" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.gradeCharge }}</span>
+          <span>{{ row.olderName }}</span>
         </template>
       </el-table-column>
 
       <el-table-column
+
         :label="$t('table.actions')"
         align="center"
-        width="200"
+        width="330"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{row}">
@@ -121,23 +123,23 @@
         label-width="100px"
         style="width: 40  0px; margin-left:50px;"
       >
-        <!--
-        3.在这里修改表单
-        <el-form-item label='修改列名中文' hidden>
-        <el-input v-model="temp.修改列名" />
-        -->
-        <el-form-item label="医护等级编号" hidden>
-          <el-input v-model="temp.gradeId" />
+        <!-- 添加 -->
+        <el-form-item label="房间编号" prop="roomId" hidden>
+          <el-input v-model="temp.roomId" type="text" :rows="2" placeholder="请填写房间编号" />
         </el-form-item>
-        <el-form-item label="医护等级名称" prop="equipName">
-          <el-input v-model="temp.gradeName" placeholder="请填写医护等级名称" />
+
+        <el-form-item label="房间名字" prop="roomName">
+          <el-input v-model="temp.roomName" type="text" :rows="2" placeholder="请填写房间名字" />
         </el-form-item>
-        <el-form-item label="医护服务内容">
-          <el-input v-model="temp.gradeContent" placeholder="请填写医护服务内容" />
+
+        <el-form-item label="医生名字" prop="doctorId">
+          <el-input v-model="temp.doctorId" type="textarea" :rows="2" placeholder="请填写名字" />
         </el-form-item>
-        <el-form-item label="医护收费标准">
-          <el-input v-model="temp.gradeCharge" placeholder="请填写医护收费标准" />
+
+        <el-form-item label="老人名字" prop="olderId">
+          <el-input v-model="temp.olderId" type="textarea" :rows="2" placeholder="请填写老人" />
         </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -162,16 +164,16 @@
 
 <script>
 import {
-  createArticle,
-  deleteArticle,
   fetchList,
-  updateArticle
-} from '@/api/grade'
+  fetchPv,
+  createArticle,
+  updateArticle,
+  deleteArticle
+} from '@/api/room'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { mapGetters } from 'vuex'
-
 export default {
 
   name: 'ComplexTable',
@@ -186,17 +188,18 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        // 4.添加搜索条件 （上面两个不动）
-        // 修改列名: undefined,
-        gradeName: undefined,
-        gradeContent: undefined
+        roomName: '',
+        doctorId: '',
+        olderId: ''
       },
       temp: {
-        gradeId: undefined,
-        gradeName: '',
-        gradeContent: '',
-        gradeCharge: ''
+        roomId: undefined,
+        roomName: '',
+        doctorId: undefined,
+        olderId: undefined
+
       },
+
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -235,24 +238,25 @@ export default {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data
-        this.total = 40
+        this.total = 100
 
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 1.5 * 0)
       })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
     },
+    // 修改使用
     resetTemp() {
       this.temp = {
-        dietId: undefined,
-        dietFood: '',
-        dietTime: new Date(),
-        doctorName: ''
+        roomId: undefined,
+        roomName: '',
+        doctorId: undefined,
+        olderId: undefined
       }
     },
     handleCreate() {
@@ -282,7 +286,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.dietTime = new Date(this.temp.dietTime)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -293,7 +296,7 @@ export default {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.dietTime = +new Date(tempData.dietTime) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          // tempData.dietTime = +new Date(tempData.dietTime); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then(response => {
             this.dialogFormVisible = false
             this.$notify({
@@ -307,7 +310,7 @@ export default {
       })
     },
     handleDelete(row) {
-      deleteArticle(row.gradeId).then(response => {
+      deleteArticle(row.roomId).then(response => {
         this.$notify({
           title: '成功',
           message: response.msg,
@@ -325,11 +328,12 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['膳食序号', '当天时间', '膳食内容', '医师编号', '负责医师']
+        const tHeader = ['房间编号', '房间号', '医生编号', '医生名字', '老人编号', '老人姓名']
         const filterVal = [
-          'dietId',
-          'dietTime',
-          'dietFood',
+          'roomId',
+          'roomName',
+          'fileStudy',
+          'fileExam',
           'doctorId',
           'doctorName'
         ]
@@ -337,7 +341,7 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: '膳食信息表'
+          filename: '员工档案'
         })
         this.downloadLoading = false
       })

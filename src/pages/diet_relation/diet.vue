@@ -1,50 +1,5 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <!--
-        1.修改搜索条件
-        v-model="listQuery.修改列名"
-        placeholder="中文列名"
-        v-->
-      <el-input
-        v-model="listQuery.gradeName"
-        placeholder="医护等级名称"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-input
-        v-model="listQuery.gradeContent"
-        placeholder="医护服务内容"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <!-- 1.在这里之前修改 -->
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >{{ $t('table.search') }}</el-button>
-      <el-button
-        class="filter-item"
-        style="margin-left: 10px;"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >{{ $t('table.add') }}</el-button>
-      <el-button
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >{{ $t('table.export') }}</el-button>
-    </div>
-
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -54,51 +9,30 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <!--
-        2.在这里修改列名
-        label="修改中文列名"
-        <span>{{ row.修改字段 }}</span>
-        一个el-table-column和template是一个整体
-      -->
       <el-table-column
-        label="医护等级编号"
+        label="膳食编号"
+        prop="dietId"
         align="center"
-        width="120"
+        width="80"
       >
         <template slot-scope="{row}">
-          <span>{{ row.gradeId }}</span>
+          <span>{{ row.dietId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="医护服务等级" width="150px" align="center">
+      <el-table-column label="膳食时间" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.gradeName }}</span>
+          <span>{{ row.dietTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="医护服务内容" max-width="750px" align="center">
+      <el-table-column label="膳食内容" min-width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.gradeContent }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="医护收费标准" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.gradeCharge }}</span>
+          <span>{{ row.dietFood }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        :label="$t('table.actions')"
-        align="center"
-        width="200"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="负责医师" width="110px" align="center">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">{{ $t('table.edit') }}</el-button>
-          <el-button
-            v-if="row.status!='deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row)"
-          >{{ $t('table.delete') }}</el-button>
+          <span>{{ row.doctorName }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -111,43 +45,6 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="left"
-        label-width="100px"
-        style="width: 40  0px; margin-left:50px;"
-      >
-        <!--
-        3.在这里修改表单
-        <el-form-item label='修改列名中文' hidden>
-        <el-input v-model="temp.修改列名" />
-        -->
-        <el-form-item label="医护等级编号" hidden>
-          <el-input v-model="temp.gradeId" />
-        </el-form-item>
-        <el-form-item label="医护等级名称" prop="equipName">
-          <el-input v-model="temp.gradeName" placeholder="请填写医护等级名称" />
-        </el-form-item>
-        <el-form-item label="医护服务内容">
-          <el-input v-model="temp.gradeContent" placeholder="请填写医护服务内容" />
-        </el-form-item>
-        <el-form-item label="医护收费标准">
-          <el-input v-model="temp.gradeCharge" placeholder="请填写医护收费标准" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button
-          type="primary"
-          @click="dialogStatus==='create'?createData():updateData()"
-        >{{ $t('table.confirm') }}</el-button>
-      </div>
-    </el-dialog>
-
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
         <el-table-column prop="key" label="Channel" />
@@ -162,11 +59,12 @@
 
 <script>
 import {
-  createArticle,
-  deleteArticle,
   fetchList,
-  updateArticle
-} from '@/api/grade'
+  fetchPv,
+  createArticle,
+  updateArticle,
+  deleteArticle
+} from '@/api/diet'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -186,16 +84,15 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        // 4.添加搜索条件 （上面两个不动）
-        // 修改列名: undefined,
-        gradeName: undefined,
-        gradeContent: undefined
+        dietFood: undefined,
+        dietTime: undefined
       },
       temp: {
-        gradeId: undefined,
-        gradeName: '',
-        gradeContent: '',
-        gradeCharge: ''
+        dietId: undefined,
+        dietFood: '',
+        dietTime: new Date(),
+        doctorName: '',
+        doctorId: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -234,8 +131,8 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data
-        this.total = 40
+        this.list = response.data.list
+        this.total = response.data.count
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -307,7 +204,7 @@ export default {
       })
     },
     handleDelete(row) {
-      deleteArticle(row.gradeId).then(response => {
+      deleteArticle(row.dietId).then(response => {
         this.$notify({
           title: '成功',
           message: response.msg,
