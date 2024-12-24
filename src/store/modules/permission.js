@@ -45,7 +45,6 @@ const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
-    console.log(state.routes)
   }
 }
 
@@ -55,7 +54,7 @@ function concatRouter(router) {
     return routers
   } else {
     router.forEach(item => {
-      if (item.pageHidden==="false"){
+      if (item.pageHidden === 'false') {
         item.pageHidden = false
       } else {
         item.pageHidden = true
@@ -70,7 +69,7 @@ function concatRouter(router) {
       itemRouter.meta.icon = item.pageIcon
       const children = []
       item.pageChildren.forEach(child => {
-        if (child.pageHidden==="false"){
+        if (child.pageHidden === 'false') {
           child.pageHidden = false
         } else {
           child.pageHidden = true

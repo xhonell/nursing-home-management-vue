@@ -2,18 +2,17 @@ import request from '@/utils/request'
 
 export function fetchList(query) {
   return request({
-    url: '/activity/list',
+    url: '/risk/list',
     method: 'get',
     params: query
   })
 }
 
 export function deleteArticle(id) {
-  console.log(id)
   return request({
-    url: '/activity/delete',
+    url: '/risk/delete',
     method: 'get',
-    params: { 'activityId': id }
+    params: { 'riskId': id }
   })
 }
 
@@ -35,7 +34,7 @@ export function fetchPv(pv) {
 
 export function createArticle(data) {
   return request({
-    url: '/activity/insert',
+    url: '/risk/insert',
     method: 'get',
     params: data
   })
@@ -43,7 +42,7 @@ export function createArticle(data) {
 
 export function updateArticle(data) {
   return request({
-    url: '/activity/update',
+    url: '/risk/update',
     method: 'get',
     params: data
   })

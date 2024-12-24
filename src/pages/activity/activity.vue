@@ -1,22 +1,37 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
+      <!-- 搜索框 -->
       <el-input
-        v-model="listQuery.olderName"
-        placeholder="老人名称"
+        v-model="listQuery.activityName"
+        placeholder="活动名称"
         style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select v-model="listQuery.healthState" class="filter-item" placeholder="请选择">
-        <el-option v-for="item in state" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-date-picker
-        v-model="listQuery.healthTime"
-        type="datetime"
+      <el-input
+        v-model="listQuery.activityAddress"
+        placeholder="活动地址"
+        style="width: 200px;"
         class="filter-item"
-        placeholder="选择日期时间"
+        @keyup.enter.native="handleFilter"
       />
+
+      <el-input
+        v-model="listQuery.doctorName"
+        placeholder="医生"
+        style="width: 200px;"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
+      <!-- <el-date-picker
+          v-model="listQuery.activityTime"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+          type="datetime"
+          class="filter-item"
+          placeholder="选择时间"
+        ></el-date-picker> -->
 
       <el-button
         v-waves
@@ -41,7 +56,7 @@
         @click="handleDownload"
       >{{ $t('table.export') }}</el-button>
     </div>
-
+    <!-- 头部显示栏 -->
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -51,55 +66,46 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column label="记录编号" prop="healthId" align="center" width="80">
-        <template slot-scope="{row}">
-          <span>{{ row.healthId }}</span>
+      <el-table-column label="活动编号" align="center" width="80">
+        <template slot-scope="scope">
+          <span>{{ ((listQuery.page - 1) * listQuery.limit) + (scope.$index + 1) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="健康状态" width="110px" align="center">
+
+      <el-table-column label="活动名称" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthState }}</span>
+          <span>{{ row.activityName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="身高" width="110px" align="center">
+
+      <el-table-column label="活动时间" min-width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthHeight }}</span>
+          <span>{{ row.activityTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="体重" width="110px" align="center">
+
+      <el-table-column label="活动地址" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthWeight }}</span>
+          <span>{{ row.activityAddress }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="血压" width="110px" align="center">
+
+      <el-table-column label="活动内容" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.healthBlood }}</span>
+          <span>{{ row.activityContent }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="心率" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.healthHeart }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="记录时间" min-width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.healthTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="老人名称" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.olderName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="负责医师" width="110px" align="center">
+
+      <el-table-column label="医生" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.doctorName }}</span>
         </template>
       </el-table-column>
+
       <el-table-column
         :label="$t('table.actions')"
         align="center"
-        width="230"
+        width="330"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{row}">
@@ -132,45 +138,38 @@
         label-width="100px"
         style="width: 40  0px; margin-left:50px;"
       >
-        <el-form-item label="记录编号" hidden>
-          <el-input v-model="temp.healthId" />
+        <!-- 添加栏 -->
+        <el-form-item label="活动编号" hidden>
+          <el-input v-model="temp.activityId" />
         </el-form-item>
-        <el-form-item label="健康状态" prop="healthState">
-          <el-select v-model="temp.healthState" placeholder="请选择">
-            <el-option v-for="item in state" :key="item" :label="item" :value="item" />
-          </el-select>
+
+        <el-form-item label="活动名字" prop="activityName">
+          <el-input v-model="temp.activityName" type="textarea" :rows="2" placeholder="请填写活动地址" />
         </el-form-item>
-        <el-form-item label="身高" prop="healthHeight">
-          <el-input v-model="temp.healthHeight" />
+
+        <el-form-item label="活动时间" prop="activityTime">
+          <el-date-picker
+            v-model="temp.activityTime"
+            type="datetime"
+            placeholder="请选择一个时间"
+          />
         </el-form-item>
-        <el-form-item label="体重" prop="healthWeight">
-          <el-input v-model="temp.healthWeight" />
+        <el-form-item label="活动地址" prop="activityAddress">
+          <el-input v-model="temp.activityAddress" type="textarea" :rows="2" placeholder="请填写活动地址" />
         </el-form-item>
-        <el-form-item label="血压" prop="healthBlood">
-          <el-input v-model="temp.healthBlood" />
+
+        <el-form-item label="活动内容" prop="activityContent">
+          <el-input v-model="temp.activityContent" type="textarea" :rows="2" placeholder="请填写活动内容" />
         </el-form-item>
-        <el-form-item label="心率" prop="healthHeart">
-          <el-input v-model="temp.healthHeart" />
-        </el-form-item>
-        <el-form-item label="记录时间" prop="healthTime">
-          <el-date-picker v-model="temp.healthTime" type="datetime" placeholder="请选择一个时间" />
-        </el-form-item>
-        <el-form-item label="老人编号" hidden>
-          <el-select v-model="temp.olderId" placeholder="请选择" @change="onOlderIdChange">
-            <el-option v-for="(item,index) in olderIds" :key="index" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="老人名称" prop="olderName">
-          <el-select v-model="temp.olderName" placeholder="请选择" @change="onOlderNameChange">
-            <el-option v-for="(item,index) in olderNames" :key="index" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
+
         <el-form-item label="医师编号" hidden>
           <el-input v-model="temp.doctorId" />
         </el-form-item>
+
         <el-form-item label="填写医师">
           <el-input v-model="temp.doctorName" readonly />
         </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -199,23 +198,22 @@ import {
   fetchPv,
   createArticle,
   updateArticle,
-  deleteArticle,
-  getOlderName
-} from '@/api/health'
+  deleteArticle
+}
+// 修改Api
+from '@/api/activity'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { mapGetters } from 'vuex'
 
 export default {
+
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   data() {
     return {
-      olderNames: [],
-      olderIds: [],
-      state: ['正常', '感冒', '发烧', '隔离'],
       tableKey: 0,
       list: null,
       total: 0,
@@ -223,20 +221,17 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        healthState: undefined,
-        olderName: undefined,
-        healthTime: undefined
+        activityName: '',
+        activityAddress: '',
+        doctorId: ''
       },
+      // 修改
       temp: {
-        healthId: undefined,
-        healthState: '',
-        healthHeight: undefined,
-        healthWeight: undefined,
-        healthBlood: undefined,
-        healthHeart: undefined,
-        healthTime: new Date(),
-        olderId: undefined,
-        olderName: '',
+        activityId: undefined,
+        activityName: '',
+        activityTime: new Date(),
+        activityAddress: '',
+        activityContent: '',
         doctorId: undefined,
         doctorName: ''
       },
@@ -249,7 +244,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        healthTime: [
+        activityTime: [
           {
             type: 'date',
             required: true,
@@ -257,69 +252,28 @@ export default {
             trigger: 'change'
           }
         ],
-        healthState: [
-          { required: true, message: '健康状态不能为空', trigger: 'blur' }
-        ],
-        healthBlood: [
-          { required: true, message: '血压不能为空', trigger: 'blur' }
-        ],
-        healthHeart: [
-          { required: true, message: '心率不能为空', trigger: 'blur' }
-        ],
-        healthWeight: [
-          { required: true, message: '体重不能为空', trigger: 'blur' }
-        ],
-        healthHeight: [
-          { required: true, message: '身高不能为空', trigger: 'blur' }
-        ],
-        olderName: [
-          { required: true, message: '老人姓名不能为空', trigger: 'blur' }
+        dietFood: [
+          { required: true, message: '膳食内容不能为空', trigger: 'blur' }
         ]
       },
       downloadLoading: false
     }
   },
-  watch: {
-    // 当olderId变化时，更新olderName
-    'temp.olderId': function(newId) {
-      const index = this.olderIds.indexOf(newId)
-      if (index !== -1) {
-        this.temp.olderName = this.olderNames[index] // 同步更新老人名称
-      }
-    },
-    // 当olderName变化时，更新olderId
-    'temp.olderName': function(newName) {
-      const index = this.olderNames.indexOf(newName)
-      if (index !== -1) {
-        this.temp.olderId = this.olderIds[index] // 同步更新老人编号
-      }
-    }
-  },
   computed: {
-    ...mapGetters(['name', 'id'])
+    ...mapGetters([
+      'name',
+      'id'
+    ])
   },
   created() {
     this.getList()
-    this.getOlders()
   },
   methods: {
-    onOlderIdChange(value) {
-      const index = this.olderIds.indexOf(value)
-      if (index !== -1) {
-        this.temp.olderName = this.olderNames[index]
-      }
-    },
-    onOlderNameChange(value) {
-      const index = this.olderNames.indexOf(value)
-      if (index !== -1) {
-        this.temp.olderId = this.olderIds[index]
-      }
-    },
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.healthList
-        this.total = response.data.total
+        this.list = response.data
+        this.total = 100
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -331,17 +285,14 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
+    // 是方法里面的调用
     resetTemp() {
       this.temp = {
-        healthId: undefined,
-        healthState: '',
-        healthHeight: undefined,
-        healthWeight: undefined,
-        healthBlood: undefined,
-        healthHeart: undefined,
-        healthTime: new Date(),
-        olderId: undefined,
-        olderName: '',
+        activityId: undefined,
+        activityName: '',
+        activityTime: new Date(),
+        activityAddress: '',
+        activityContent: '',
         doctorId: undefined,
         doctorName: ''
       }
@@ -359,6 +310,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
+          this.temp.activityTime = +new Date(this.temp.activityTime)// 转换为时间戳
           createArticle(this.temp).then(response => {
             this.dialogFormVisible = false
             this.$notify({
@@ -373,18 +325,19 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.dietTime = new Date(this.temp.dietTime)
+      this.temp.activityTime = new Date(this.temp.activityTime)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    // 修改
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.dietTime = +new Date(tempData.dietTime) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          tempData.activityTime = +new Date(tempData.activityTime) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then(response => {
             this.dialogFormVisible = false
             this.$notify({
@@ -397,15 +350,10 @@ export default {
         }
       })
     },
-    getOlders() {
-      getOlderName().then(response => {
-        const { data } = response
-        this.olderIds = data.olderIds
-        this.olderNames = data.olderNames
-      })
-    },
+    // 删除
+
     handleDelete(row) {
-      deleteArticle(row.healthId).then(response => {
+      deleteArticle(row.activityId).then(response => {
         this.$notify({
           title: '成功',
           message: response.msg,
@@ -420,32 +368,15 @@ export default {
         this.dialogPvVisible = true
       })
     },
+    // 文件导出
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = [
-          '档案编号',
-          '身体状况',
-          '身高',
-          '体重',
-          '血压',
-          '心率',
-          '记录时间',
-          '老人编号',
-          '老人姓名',
-          '医生编号',
-          '医生姓名'
-        ]
+        const tHeader = ['活动编号', '当天时间', '膳食内容', '医师编号', '负责医师']
         const filterVal = [
-          'healthId',
-          'healthState',
-          'healthHeight',
-          'healthWeight',
-          'healthBlood',
-          'healthHeart',
-          'healthTime',
-          'olderId',
-          'olderName',
+          'activityId',
+          'activityTime',
+          'dietFood',
           'doctorId',
           'doctorName'
         ]
@@ -453,7 +384,7 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: '健康档案表表'
+          filename: '活动信息表'
         })
         this.downloadLoading = false
       })
@@ -461,7 +392,7 @@ export default {
     formatJson(filterVal) {
       return this.list.map(v =>
         filterVal.map(j => {
-          if (j === 'healthTime') {
+          if (j === 'activityTime') {
             return parseTime(v[j])
           } else {
             return v[j]
