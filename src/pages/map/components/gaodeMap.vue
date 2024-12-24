@@ -1,6 +1,6 @@
 <template>
   <div class="map-container">
-    <div id="container">这是地图接口</div>
+    <div id="container" />
     <div id="route-panel" class="route-panel" />
     <!-- 路线信息显示面板 -->
   </div>
@@ -16,7 +16,10 @@ export default {
       map: null,
       marker: null, // 当前用户位置的标记
       nursingHomeMarker: null, // 养老院位置的标记
-      drivingRoute: null // 路线规划对象
+      drivingRoute: null, // 路线规划对象
+      defaultPosition: [116.397428, 39.90923], // 默认位置
+      zoomLevel: 13, // 地图缩放级别
+      nursingHomePosition: [104.0658, 30.6631] // 养老院位置
     }
   },
   computed: {
@@ -36,7 +39,7 @@ export default {
       .then(AMap => {
         this.map = new AMap.Map('container', {
           viewMode: '3D', // 是否为3D地图模式
-          zoom: 11 // 初始化地图级别
+          zoom: this.zoomLevel // 初始化地图级别
         })
 
         // 创建一个比例尺插件
@@ -48,182 +51,158 @@ export default {
         // 添加养老院位置标记
         this.addNursingHomeMarker(AMap)
       })
-      .catch(e => {
-        console.error(e)
-      })
+      .catch(e => this.handleError('地图加载失败，请稍后重试！', e))
   },
   methods: {
     getCurrentLocation(AMap) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          position => {
-            const { latitude, longitude } = position.coords
-
-            // 设置地图中心点为当前位置
-            this.map.setCenter([longitude, latitude])
-
-            // 创建一个新的标记
-            if (this.marker) {
-              // 如果已经有标记，先移除它
-              this.marker.setMap(null)
-            }
-
-            // 设置头像图标大小并且调整偏移量
-            const wristbandIcon = new AMap.Icon({
-              image: this.avatar,
-              size: new AMap.Size(50, 50), // 设置头像图标的大小
-              imageSize: new AMap.Size(50, 50) // 重新设置图标大小
-            })
-
-            this.marker = new AMap.Marker({
-              position: [longitude, latitude],
-              icon: wristbandIcon,
-              offset: new AMap.Pixel(-25, -50) // 偏移量调整，确保标记完全可见
-            })
-
-            // 添加标记到地图
-            this.marker.setMap(this.map)
-
-            // 调整地图缩放级别，使头像完整显示
-            this.adjustZoomLevel(AMap, [longitude, latitude])
-
-            // 调用路线规划
-            this.addRoute(AMap, [longitude, latitude])
-          },
-          error => {
-            console.error('定位失败: ', error)
-            // 定位失败后使用默认位置
-            this.map.setCenter([116.397428, 39.90923])
-
-            // 创建一个默认位置的标记
-            if (this.marker) {
-              this.marker.setMap(null)
-            }
-
-            const wristbandIcon = new AMap.Icon({
-              image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
-              size: new AMap.Size(50, 50) // 设置默认图标的大小
-            })
-
-            this.marker = new AMap.Marker({
-              position: [116.397428, 39.90923],
-              icon: wristbandIcon,
-              offset: new AMap.Pixel(-25, -50)
-            })
-
-            // 添加标记到地图
-            this.marker.setMap(this.map)
-          }
+          position => this.handlePositionSuccess(AMap, position),
+          error => this.handlePositionError(AMap, error)
         )
       } else {
-        console.error('浏览器不支持定位功能')
-        // 如果浏览器不支持定位，使用默认位置
-        this.map.setCenter([116.397428, 39.90923])
-
-        // 创建一个默认位置的标记
-        if (this.marker) {
-          this.marker.setMap(null)
-        }
-
-        const wristbandIcon = new AMap.Icon({
-          image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
-          size: new AMap.Size(50, 50) // 设置默认图标的大小
+        this.$message({
+          showClose: true,
+          message: '定位失败，请检查是否开启定位！',
+          type: 'error'
         })
-
-        this.marker = new AMap.Marker({
-          position: [116.397428, 39.90923],
-          icon: wristbandIcon,
-          offset: new AMap.Pixel(-25, -50)
-        })
-
-        // 添加标记到地图
-        this.marker.setMap(this.map)
+        this.createMarker(AMap, this.defaultPosition)
+        this.addRoute(AMap, this.defaultPosition)
       }
     },
 
+    handlePositionSuccess(AMap, position) {
+      const { latitude, longitude } = position.coords
+
+      // 设置地图中心点为当前位置
+      this.map.setCenter([longitude, latitude])
+
+      // 创建一个新的标记
+      this.createMarker(AMap, [longitude, latitude])
+
+      // 调整地图缩放级别
+      this.adjustZoomLevel(AMap, [longitude, latitude])
+
+      // 定位成功后规划路线
+      this.addRoute(AMap, [longitude, latitude])
+    },
+
+    handlePositionError(AMap, error) {
+      this.$message({
+        showClose: true,
+        message: '定位失败，请检查是否开启定位！',
+        type: 'error'
+      })
+      this.createMarker(AMap, this.defaultPosition)
+      this.addRoute(AMap, this.defaultPosition)
+    },
+
+    createMarker(AMap, position) {
+      // 设置头像图标大小并且调整偏移量
+      const icon = new AMap.Icon({
+        image: this.avatar || 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+        size: new AMap.Size(50, 50), // 设置头像图标的大小
+        imageSize: new AMap.Size(50, 50) // 重新设置图标大小
+      })
+
+      if (this.marker) {
+        this.marker.setMap(null) // 移除旧标记
+      }
+
+      this.marker = new AMap.Marker({
+        position: position,
+        icon: icon,
+        offset: new AMap.Pixel(-25, -50) // 偏移量调整，确保标记完全可见
+      })
+
+      this.marker.setMap(this.map)
+    },
+
     adjustZoomLevel(AMap, position) {
-      // 计算并调整地图的缩放级别
       const zoomLevel = this.calculateZoomLevel(position)
-      this.map.setZoom(zoomLevel) // 动态调整缩放级别
+      this.map.setZoom(zoomLevel)
     },
 
     calculateZoomLevel(position) {
-      // 你可以根据需要调整这个方法来计算缩放级别
-      // 这里只是一个示例，假设我们根据位置调整缩放级别
-      const zoomLevel = 13 // 设置一个合适的缩放级别
-      return zoomLevel
+      return this.zoomLevel // 固定缩放级别
     },
 
     addNursingHomeMarker(AMap) {
-      // 养老院的坐标
-      const nursingHomePosition = [104.0658, 30.6631]
-
-      // 创建养老院图标
       const nursingHomeIcon = new AMap.Icon({
-        image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png', // 假设有一个专门的养老院图标
+        image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
         size: new AMap.Size(32, 32)
       })
 
-      // 创建养老院标记
       this.nursingHomeMarker = new AMap.Marker({
-        position: nursingHomePosition,
+        position: this.nursingHomePosition,
         icon: nursingHomeIcon,
-        offset: new AMap.Pixel(-16, -32) // 偏移量
+        offset: new AMap.Pixel(-16, -32)
       })
 
-      // 创建信息窗体
       const infoWindow = new AMap.InfoWindow({
         content:
-          '<div><strong>悦年康居养老院</strong><br>四川省成都市成华大道二仙桥对面</div>', // 信息窗体的内容
-        offset: new AMap.Pixel(0, -32) // 信息窗体的偏移量
+          '<div><strong>悦年康居养老院</strong><br>四川省成都市成华大道二仙桥对面</div>',
+        offset: new AMap.Pixel(0, -32)
       })
 
-      // 当标记被点击时，打开信息窗体
       this.nursingHomeMarker.on('click', () => {
-        infoWindow.open(this.map, nursingHomePosition)
+        infoWindow.open(this.map, this.nursingHomePosition)
       })
 
-      // 添加养老院标记到地图
       this.map.add(this.nursingHomeMarker)
     },
 
     addRoute(AMap, startPosition) {
-      const nursingHomePosition = [104.0658, 30.6631] // 养老院位置
-
-      // 使用驾车路线规划服务
       const driving = new AMap.Driving({
         map: this.map,
-        panel: 'route-panel', // 在指定元素中显示路线详情
+        panel: 'route-panel',
         autoClamped: true
       })
 
-      driving.search(startPosition, nursingHomePosition, (status, result) => {
+      driving.search(startPosition, this.nursingHomePosition, (status, result) => {
         if (status === 'complete') {
-          console.log('路线规划成功')
+          this.$message({
+            showClose: true,
+            message: '路线规划成功！',
+            type: 'success'
+          })
         } else {
-          console.error('路线规划失败: ', result)
+          this.$message({
+            showClose: true,
+            message: '路线规划失败，请检查路线是否可达！',
+            type: 'error'
+          })
         }
+      })
+    },
+
+    handleError(message, error) {
+      console.error(error)
+      this.$message({
+        showClose: true,
+        message: message,
+        type: 'error'
       })
     }
   }
 }
 </script>
 
-  <style>
+<style>
 .map-container {
   display: flex;
   flex-direction: column;
-  height: 89.7vh; /* 使容器占满整个视口 */
+  height: 89.7vh;
 }
 
 #container {
-  flex: 1; /* 让地图部分占用剩余空间 */
+  flex: 1;
   font-family: "楷体";
 }
 
 .route-panel {
-  max-height: 20vh; /* 设置路线信息面板的最大高度 */
-  flex-shrink: 0; /* 防止面板收缩 */
+  max-height: 20vh;
+  flex-shrink: 0;
   overflow-y: scroll;
   background-color: rgba(255, 255, 255, 0.9);
   position: relative;

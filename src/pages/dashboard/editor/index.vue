@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-editor-container" style=" font-family: '楷体'">
+  <div class="dashboard-editor-container" style="font-family: '楷体'">
     <div class="clearfix">
       <pan-thumb :image="avatar" style="float: left">
         当前权限:
@@ -19,11 +19,18 @@
           <menber />
         </div>
       </el-col>
-      <el-col :span="8" style="text-align: center; " :offset="2">
+      <el-col :span="8" style="text-align: center;" :offset="2">
         <div ref="chartDom" class="chart-container-two" />
         <span style="position: relative; top:-60px">看着牛逼图</span>
       </el-col>
     </el-row>
+
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+      <span>当前欠费信息 <span style="color: red;font-size: 24px;">{{ money }}</span></span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleClose">去付款</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -31,7 +38,7 @@
 import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
 import * as echarts from 'echarts'
-import { getEcharsAge } from '@/api/echars'
+import { getEcharsAge, getArrears, setArrears } from '@/api/echars'
 import menber from './menber.vue'
 
 export default {
@@ -39,18 +46,48 @@ export default {
   components: { PanThumb, menber },
   data() {
     return {
-      age: []
+      age: [],
+      dialogVisible: false,
+      money: undefined,
+      feeId: undefined
     }
   },
   computed: {
     ...mapGetters(['name', 'avatar', 'roles'])
   },
   async mounted() {
+    if (this.$store.getters.relationId) {
+      await this.checkArrears(this.$store.getters.relationId)
+    }
     await this.getAge()
     this.initChart()
     this.initChart2()
   },
   methods: {
+    async checkArrears(id) {
+      try {
+        const response = await getArrears(id)
+        const { feeState, feePrice, feeId } = response.data
+        if (feeState.includes('未支付')) {
+          this.feeId = feeId
+          this.dialogVisible = true
+          this.money = feePrice
+        }
+      } catch (error) {
+        console.error('检查欠款失败:', error)
+      }
+    },
+    handleClose(done) {
+      this.$confirm('确认支付')
+        .then(_ => {
+          setArrears(this.feeId).then(() => {
+            this.$message.success('支付成功')
+            this.dialogVisible = false
+          })
+          done()
+        })
+        .catch(_ => { })
+    },
     initChart() {
       const chart = echarts.init(this.$refs.chart)
       const option = {
@@ -85,9 +122,7 @@ export default {
     },
     initChart2() {
       const myChart = echarts.init(this.$refs.chartDom)
-      var option
 
-      // prettier-ignore
       const femaleData = [[161.2, 51.6], [167.5, 59.0], [159.5, 49.2], [157.0, 63.0], [155.8, 53.6],
         [170.0, 59.0], [159.1, 47.6], [166.0, 69.8], [176.2, 66.8], [160.2, 75.2],
         [172.5, 55.2], [170.9, 54.2], [172.9, 62.5], [153.4, 42.0], [160.0, 50.0],
@@ -141,8 +176,7 @@ export default {
         [169.5, 67.3], [160.0, 75.5], [172.7, 68.2], [162.6, 61.4], [157.5, 76.8],
         [176.5, 71.8], [164.4, 55.5], [160.7, 48.6], [174.0, 66.4], [163.8, 67.3]
       ]
-      // prettier-ignore
-      const maleDeta = [[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8],
+      const maleData = [[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8],
         [181.5, 74.8], [184.0, 86.4], [184.5, 78.4], [175.0, 62.0], [184.0, 81.6],
         [180.0, 76.6], [177.8, 83.6], [192.0, 90.0], [176.0, 74.6], [174.0, 71.0],
         [184.0, 79.6], [192.7, 93.8], [171.5, 70.0], [173.0, 72.4], [176.0, 85.9],
@@ -193,14 +227,16 @@ export default {
         [170.2, 62.3], [177.8, 82.7], [179.1, 79.1], [190.5, 98.2], [177.8, 84.1],
         [180.3, 83.2], [180.3, 83.2]
       ]
+
       function calculateAverage(data, dim) {
         let total = 0
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           total += data[i][dim]
         }
-        return (total /= data.length)
+        return total / data.length
       }
-      const scatterOption = (option = {
+
+      const scatterOption = {
         xAxis: {
           scale: true
         },
@@ -214,9 +250,7 @@ export default {
             dataGroupId: 'female',
             universalTransition: {
               enabled: true,
-              delay: function(idx, count) {
-                return Math.random() * 400
-              }
+              delay: (idx, count) => Math.random() * 400
             },
             data: femaleData
           },
@@ -226,14 +260,13 @@ export default {
             dataGroupId: 'male',
             universalTransition: {
               enabled: true,
-              delay: function(idx, count) {
-                return Math.random() * 400
-              }
+              delay: (idx, count) => Math.random() * 400
             },
-            data: maleDeta
+            data: maleData
           }
         ]
-      })
+      }
+
       const barOption = {
         xAxis: {
           type: 'category',
@@ -246,7 +279,7 @@ export default {
             id: 'total',
             data: [
               {
-                value: calculateAverage(maleDeta, 0),
+                value: calculateAverage(maleData, 0),
                 groupId: 'male'
               },
               {
@@ -257,27 +290,27 @@ export default {
             universalTransition: {
               enabled: true,
               seriesKey: ['female', 'male'],
-              delay: function(idx, count) {
-                return Math.random() * 400
-              }
+              delay: (idx, count) => Math.random() * 400
             }
           }
         ]
       }
+
       let currentOption = scatterOption
-      setInterval(function() {
-        currentOption =
-          currentOption === scatterOption ? barOption : scatterOption
+      setInterval(() => {
+        currentOption = currentOption === scatterOption ? barOption : scatterOption
         myChart.setOption(currentOption, true)
       }, 2000)
 
-      option && myChart.setOption(option)
+      myChart.setOption(scatterOption)
     },
     async getAge() {
-      await getEcharsAge().then(respose => {
-        const { data } = respose
-        this.age = data
-      })
+      try {
+        const response = await getEcharsAge()
+        this.age = response.data
+      } catch (error) {
+        console.error('获取年龄数据失败:', error)
+      }
     }
   }
 }
@@ -288,7 +321,8 @@ export default {
   margin-top: 90px;
   overflow: hidden;
 }
-.chart-container-two{
+
+.chart-container-two {
   width: 100%;
   height: 400px;
   position: relative;
@@ -299,6 +333,7 @@ export default {
   background-color: #e3e3e3;
   min-height: 89.7vh;
   padding: 50px 60px 0px;
+
   .pan-info-roles {
     margin-top: 10px;
     font-size: 12px;
@@ -306,11 +341,13 @@ export default {
     color: #333;
     display: block;
   }
+
   .info-container {
     position: relative;
     margin-left: 190px;
     height: 150px;
     line-height: 200px;
+
     .display_name {
       margin-top: 10px;
       font-size: 48px;
