@@ -27,16 +27,14 @@
         type="primary"
         icon="el-icon-search"
         @click="handleFilter"
-        >{{ $t("table.search") }}</el-button
-      >
+      >{{ $t("table.search") }}</el-button>
       <el-button
         class="filter-item"
         style="margin-left: 10px"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
-        >{{ $t("table.add") }}</el-button
-      >
+      >{{ $t("table.add") }}</el-button>
       <el-button
         v-waves
         :loading="downloadLoading"
@@ -44,8 +42,7 @@
         type="primary"
         icon="el-icon-download"
         @click="handleDownload"
-        >{{ $t("table.export") }}</el-button
-      >
+      >{{ $t("table.export") }}</el-button>
     </div>
 
     <el-table
@@ -118,8 +115,7 @@
             size="mini"
             type="danger"
             @click="handleDelete(row)"
-            >{{ $t("table.delete") }}</el-button
-          >
+          >{{ $t("table.delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -185,9 +181,7 @@
               v-for="item in options"
               :key="item"
               :value="item"
-
-            >
-            </el-option>
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -198,8 +192,7 @@
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
-          >{{ $t("table.confirm") }}</el-button
-        >
+        >{{ $t("table.confirm") }}</el-button>
       </div>
     </el-dialog>
 
@@ -228,20 +221,20 @@ import {
   createArticle,
   deleteArticle,
   fetchList,
-  updateArticle,
-} from "@/api/goods";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import { mapGetters } from "vuex";
+  updateArticle
+} from '@/api/goods'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "ComplexTable",
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   data() {
     return {
-      options: ["家具类","餐饮食品类","生活用品类","娱乐活动用品类","医疗保健类"],
+      options: ['家具类', '餐饮食品类', '生活用品类', '娱乐活动用品类', '医疗保健类'],
       tableKey: 0,
       list: null,
       total: 0,
@@ -252,178 +245,177 @@ export default {
         // 4.添加数据库搜索条件 （上面两个不动）
         // 修改列名: undefined,Name
         goodsName: undefined,
-        classifyName: undefined,
+        classifyName: undefined
       },
       temp: {
         goodsId: undefined,
-        goodsName: "",
-        goodsPrice: "",
-        goodsNumber: "",
-        goodsInDepot: "",
-        goodsProvider: "",
-        goodsStartDate: "",
-        classifyName: "",
+        goodsName: '',
+        goodsPrice: '',
+        goodsNumber: '',
+        goodsInDepot: '',
+        goodsProvider: '',
+        goodsStartDate: '',
+        classifyName: ''
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "修改",
-        create: "创建",
+        update: '修改',
+        create: '创建'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         dietTime: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "时间不能为空",
-            trigger: "change",
-          },
+            message: '时间不能为空',
+            trigger: 'change'
+          }
         ],
         dietFood: [
-          { required: true, message: "膳食内容不能为空", trigger: "blur" },
-        ],
+          { required: true, message: '膳食内容不能为空', trigger: 'blur' }
+        ]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
   },
   computed: {
-    ...mapGetters(["name", "id"]),
+    ...mapGetters(['name', 'id'])
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data;
-        this.total = 40;
+        this.list = response.data
+        this.total = 37
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false; 
-          
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     resetTemp() {
       this.temp = {
         dietId: undefined,
-        dietFood: "",
+        dietFood: '',
         dietTime: new Date(),
-        doctorName: "",
-      };
+        doctorName: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-        this.temp.doctorId = this.id;
-        this.temp.doctorName = this.name;
-      });
+        this.$refs['dataForm'].clearValidate()
+        this.temp.doctorId = this.id
+        this.temp.doctorName = this.name
+      })
     },
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           createArticle(this.temp).then((response) => {
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
+              title: '成功',
               message: response.msg,
-              type: "success",
-            });
-            this.getList();
-          });
+              type: 'success'
+            })
+            this.getList()
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.dietTime = new Date(this.temp.dietTime);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.dietTime = new Date(this.temp.dietTime)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.dietTime = +new Date(tempData.dietTime); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          const tempData = Object.assign({}, this.temp)
+          tempData.dietTime = +new Date(tempData.dietTime) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then((response) => {
-            this.dialogFormVisible = false;
+            this.dialogFormVisible = false
             this.$notify({
-              title: "成功",
+              title: '成功',
               message: response.msg,
-              type: "success",
-            });
-            this.getList();
-          });
+              type: 'success'
+            })
+            this.getList()
+          })
         }
-      });
+      })
     },
     handleDelete(row) {
       deleteArticle(row.goodsId).then((response) => {
         this.$notify({
-          title: "成功",
+          title: '成功',
           message: response.msg,
-          type: "success",
-        });
-        this.getList();
-      });
+          type: 'success'
+        })
+        this.getList()
+      })
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
         const tHeader = [
-          "膳食序号",
-          "当天时间",
-          "膳食内容",
-          "医师编号",
-          "负责医师",
-        ];
+          '膳食序号',
+          '当天时间',
+          '膳食内容',
+          '医师编号',
+          '负责医师'
+        ]
         const filterVal = [
-          "dietId",
-          "dietTime",
-          "dietFood",
-          "doctorId",
-          "doctorName",
-        ];
-        const data = this.formatJson(filterVal);
+          'dietId',
+          'dietTime',
+          'dietFood',
+          'doctorId',
+          'doctorName'
+        ]
+        const data = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "膳食信息表",
-        });
-        this.downloadLoading = false;
-      });
+          filename: '膳食信息表'
+        })
+        this.downloadLoading = false
+      })
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "dietTime") {
-            return parseTime(v[j]);
+          if (j === 'dietTime') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
-    },
-  },
-};
+      )
+    }
+  }
+}
 </script>

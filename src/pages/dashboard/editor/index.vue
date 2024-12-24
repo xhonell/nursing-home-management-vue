@@ -25,8 +25,8 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-      <span>当前欠费信息 <span style="color: red;font-size: 24px;">{{ money }}</span></span>
+    <el-dialog title="提示" :visible.sync="dialogVisible" min-width="30%" :before-close="handleClose">
+      <span>当前欠费信息 <span style="color: red;font-size: 24px;">{{ money }} </span>刀乐</span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleClose">去付款</el-button>
       </span>
@@ -318,7 +318,7 @@ export default {
 
 <style lang="scss" scoped>
 .chart-wrapper {
-  margin-top: 90px;
+  margin-top: 180px;
   overflow: hidden;
 }
 
