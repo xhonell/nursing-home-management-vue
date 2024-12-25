@@ -442,28 +442,55 @@ export default {
     handleFetchPv(pv) {
 
     },
-    handleDownload() {
-      this.downloadLoading = true
+    getAllDataForExport() {
+      let allData = []; // 存储所有页面的数据
+      const pageSize = this.listQuery.limit; // 每页数据量
+      const totalPage = Math.ceil(this.total / pageSize); // 总页数
+      let currentPage = 1;
+      const fetchData = () => {
+        this.listQuery.page = currentPage;
+        findByPage(this.listQuery).then(response => {
+          allData = allData.concat(response.data.olderList); // 收集当前页面数据
+          if (currentPage < totalPage) {
+            currentPage++; // 翻页
+            fetchData(); // 递归调用获取下一页数据
+          } else {
+            this.exportAllData(allData); // 所有页面数据收集完毕后导出
+          }
+        });
+      };
+
+      fetchData(); // 开始递归获取数据
+    },
+    exportAllData(allData) {
+      this.downloadLoading = true;
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
+        const tHeader = [
+          '编号', '姓名', '性别', '年龄','出生日期', '电话号码','健康状态', '既往病史', '入院时间', '出院时间', '医护等级', '备注'
+        ];
+        const filterVal = [
+          'olderName', 'olderSex', 'olderAge', 'olderBirth','olderPhone', 'olderHealth', 'olderHistory', 'olderStartTime', 'olderEndTime', 'gradeName', 'olderRemark'
+        ];
+        const data = this.formatJson(filterVal, allData);
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
+          filename: 'older'
+        });
+        this.downloadLoading = false;
+      });
     },
-    formatJson(filterVal) {
-      return this.list.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+
+    formatJson(filterVal, list) {
+      return list.map((v, index) => {
+        // 添加自增编号，从1开始
+        const rowData = [index + 1].concat(filterVal.map(j => v[j]));
+        return rowData;
+      });
+    },
+
+    handleDownload() {
+      this.getAllDataForExport(); // 调用导出所有数据的方法
     },
     getSortClass: function (key) {
       const sort = this.listQuery.sort

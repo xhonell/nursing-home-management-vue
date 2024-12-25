@@ -38,11 +38,6 @@
       <el-table-column label="是否赞成" prop="serviceIsAgree" sortable="custom" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.serviceIsAgree }}</span>
-          <el-radio-group v-model="serviceIsAgree">
-            <el-radio :label="1">非常同意</el-radio>
-            <el-radio :label="2">同意</el-radio>
-            <el-radio :label="3">不同意</el-radio>
-          </el-radio-group>
         </template>
       </el-table-column>
 
@@ -72,6 +67,12 @@
         <el-form-item label="解决方案">
           <el-input v-model="temp.serviceSolution" :autosize="{ minRows: 6, maxRows: 10}" type="textarea" readonly/>
         </el-form-item>
+        <el-form-item label="是否同意">
+          <el-select v-model="temp.serviceIsAgree" :autosize="{ minRows: 2, maxRows: 4 }" style="width: 330px;" clearable placeholder="是否同意">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -100,6 +101,7 @@ import { findQuestion,addQuestion,updateQuestion} from '@/api/service/service'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { mapGetters } from "vuex";
 
 export default {
   name: 'ComplexTable',
@@ -109,6 +111,19 @@ export default {
   },
   data() {
     return {
+      options: [{ //性别选项
+          value: '非常同意',
+          label: '非常同意'
+        },{
+          value: '同意',
+          label: '同意'
+        },{
+          value: '不同意',
+          label: '不同意'
+        },{
+          value: '未回复',
+          label: '未回复'
+        }],
       tableKey: 0,
       list: null, // 列表数据
       total: 0, // 总数据
@@ -124,7 +139,8 @@ export default {
         serviceId: undefined,
         serviceContent: '',
         serviceSolution:'',
-        serviceIsAgree: ''
+        serviceIsAgree: '',
+        roleId:''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -139,8 +155,15 @@ export default {
       downloadLoading: false
     }
   },
+  computed: {
+    ...mapGetters(['id'])
+  },
+
   created() { // 数据加载之后，页面渲染之前
     this.getList()
+  },
+  mounted() { // 页面渲染之后
+    this.listQuery.roleId = this.id
   },
   methods: {
     // 获取列表数据
@@ -186,13 +209,15 @@ export default {
         serviceId: undefined,
         serviceContent: '',
         serviceSolution:'',
-        serviceIsAgree: ''
+        serviceIsAgree: '',
+        roleId:''
       }
     },
 
     // 添加，弹出修改表单
     handleCreate() {
       this.resetTemp()
+      this.temp.roleId = this.listQuery.roleId;
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -225,6 +250,7 @@ export default {
     // 修改，弹出修改表单
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
+      this.temp.roleId = this.listQuery.roleId;
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
